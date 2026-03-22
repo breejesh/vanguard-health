@@ -1,0 +1,70 @@
+{
+  "resourceType": "MedicationRequest",
+  "id": "35337d89-9aa9-4d7d-b1a3-f5421543b0eb",
+  "meta": {
+    "versionId": "4",
+    "lastUpdated": "2021-04-06T03:05:29.078-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "active",
+  "intent": "order",
+  "medicationCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "code": "315971",
+        "display": "Lasix 40mg"
+      }
+    ],
+    "text": "Lasix 40mg"
+  },
+  "subject": {
+    "reference": "Patient/c5ed5d78-5b3f-4a75-bdfb-5f318b068a20"
+  },
+  "encounter": {
+    "reference": "Encounter/41ea799a-6bfb-4b82-850a-3a60b457526f"
+  },
+  "authoredOn": "1995-07-23T19:20:06+00:00",
+  "requester": {
+    "reference": "Practitioner/11cb6f4d-10ad-4f18-bc2d-7ed1d4ca0e7e"
+  },
+  "reasonReference": [
+    {
+      "reference": "Condition/323a1f6d-996b-4fdb-a852-0966df2937b5"
+    }
+  ],
+  "dosageInstruction": [
+    {
+      "sequence": 1,
+      "timing": {
+        "repeat": {
+          "frequency": 1,
+          "period": 1,
+          "periodUnit": "d"
+        }
+      },
+      "asNeededBoolean": false,
+      "doseAndRate": [
+        {
+          "type": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/dose-rate-type",
+                "code": "ordered",
+                "display": "Ordered"
+              }
+            ]
+          },
+          "doseQuantity": {
+            "value": 1
+          }
+        }
+      ]
+    }
+  ]
+}

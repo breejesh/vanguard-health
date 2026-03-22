@@ -1,0 +1,59 @@
+{
+  "resourceType": "Encounter",
+  "id": "a161b3c4-30bb-4e06-8544-fdf0ad353acb",
+  "meta": {
+    "versionId": "4",
+    "lastUpdated": "2021-04-07T03:09:33.237-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "finished",
+  "class": {
+    "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+    "code": "AMB"
+  },
+  "type": [
+    {
+      "coding": [
+        {
+          "system": "http://snomed.info/sct",
+          "code": "390906007",
+          "display": "Follow-up encounter"
+        }
+      ],
+      "text": "Follow-up encounter"
+    }
+  ],
+  "subject": {
+    "reference": "Patient/28d83205-7289-4483-a25d-877009825909"
+  },
+  "participant": [
+    {
+      "individual": {
+        "reference": "Practitioner/1cb51157-8083-410f-87d1-07a94629222a"
+      }
+    }
+  ],
+  "period": {
+    "start": "1998-12-05T05:24:48+00:00",
+    "end": "1998-12-05T05:39:48+00:00"
+  },
+  "reasonCode": [
+    {
+      "coding": [
+        {
+          "system": "http://snomed.info/sct",
+          "code": "55822004",
+          "display": "Hyperlipidemia"
+        }
+      ]
+    }
+  ],
+  "serviceProvider": {
+    "reference": "Organization/8ad64ecf-c817-3753-bee7-006a8e662e06"
+  }
+}

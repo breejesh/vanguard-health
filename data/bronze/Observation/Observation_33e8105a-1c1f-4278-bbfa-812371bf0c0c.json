@@ -1,0 +1,50 @@
+{
+  "resourceType": "Observation",
+  "id": "33e8105a-1c1f-4278-bbfa-812371bf0c0c",
+  "meta": {
+    "versionId": "4",
+    "lastUpdated": "2021-04-06T03:01:34.420-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+          "code": "laboratory",
+          "display": "laboratory"
+        }
+      ]
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "2339-0",
+        "display": "Glucose"
+      }
+    ],
+    "text": "Glucose"
+  },
+  "subject": {
+    "reference": "Patient/63c5db14-f5b0-4405-9ff6-0b88601ddb22"
+  },
+  "encounter": {
+    "reference": "Encounter/e7eccd9f-4a69-47f9-b649-fc63c5ef7073"
+  },
+  "effectiveDateTime": "2012-10-04T06:29:54+00:00",
+  "issued": "2012-10-04T06:29:54.552+00:00",
+  "valueQuantity": {
+    "value": 92.6082600046108,
+    "unit": "mg/dL",
+    "system": "http://unitsofmeasure.org",
+    "code": "mg/dL"
+  }
+}

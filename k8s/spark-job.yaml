@@ -1,0 +1,54 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: bronze-to-silver
+  namespace: vanguard-health
+spec:
+  ttlSecondsAfterFinished: 86400  # Keep job for 24 hours after completion
+  backoffLimit: 3
+  activeDeadlineSeconds: 7200  # 2 hour timeout
+  template:
+    metadata:
+      labels:
+        app: bronze-to-silver
+    spec:
+      serviceAccountName: vanguard-sa
+      containers:
+      - name: spark-driver
+        image: vanguard/spark-jobs:v1.0.0
+        command: 
+        - spark-submit
+        - --master
+        - local[4]
+        - --driver-memory
+        - 2g
+        - --executor-memory
+        - 2g
+        - --conf
+        - spark.sql.extensions=org.apache.spark.sql.hudi.HoodieSparkSessionExtension
+        - src/spark_jobs/bronze_to_silver.py
+        envFrom:
+        - configMapRef:
+            name: app-config
+        - secretRef:
+            name: app-secrets
+        volumeMounts:
+        - name: data
+          mountPath: /mnt/data
+        - name: logs
+          mountPath: /app/logs
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "2"
+          limits:
+            memory: "8Gi"
+            cpu: "4"
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: data-pvc
+      - name: logs
+        emptyDir: {}
+      restartPolicy: Never

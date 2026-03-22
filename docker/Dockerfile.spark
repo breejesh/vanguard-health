@@ -1,0 +1,27 @@
+FROM apache/spark:3.3.2-python3
+
+USER root
+
+# Install additional dependencies
+RUN pip install --no-cache-dir \
+    pymongo==4.5.0 \
+    redis==5.0.0 \
+    firebase-admin==6.2.0 \
+    python-dotenv==1.0.0 \
+    pydantic==2.0.2
+
+WORKDIR /app
+
+# Copy application code
+COPY src/ ./src/
+COPY config/ ./config/
+COPY docker/requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+ENV PYTHONPATH=/app
+
+USER spark
+
+# Run Spark job via spark-submit
+ENTRYPOINT ["spark-submit"]

@@ -1,0 +1,41 @@
+{
+  "resourceType": "MedicationRequest",
+  "id": "8d85ebb2-fbdf-4193-8c58-5a496693ca00",
+  "meta": {
+    "versionId": "4",
+    "lastUpdated": "2021-04-06T03:05:41.675-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "stopped",
+  "intent": "order",
+  "medicationCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "code": "1736854",
+        "display": "Cisplatin 50 MG Injection"
+      }
+    ],
+    "text": "Cisplatin 50 MG Injection"
+  },
+  "subject": {
+    "reference": "Patient/1a96f2e7-7ce0-4164-b3f6-4fdffeca00fb"
+  },
+  "encounter": {
+    "reference": "Encounter/f82507ce-72ee-4c13-9ee6-427e055d2ed0"
+  },
+  "authoredOn": "2011-08-25T18:28:42+00:00",
+  "requester": {
+    "reference": "Practitioner/79a13b7d-a382-4b6a-a31a-57e763818a56"
+  },
+  "reasonReference": [
+    {
+      "reference": "Condition/2aaad52d-b7d0-4a83-9621-a6e8034ee75b"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "resourceType": "Observation",
+  "id": "6ba9decf-7581-4670-b45b-7c1f38eeac69",
+  "meta": {
+    "versionId": "4",
+    "lastUpdated": "2021-04-06T03:01:34.344-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+          "code": "vital-signs",
+          "display": "vital-signs"
+        }
+      ]
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "72514-3",
+        "display": "Pain severity - 0-10 verbal numeric rating [Score] - Reported"
+      }
+    ],
+    "text": "Pain severity - 0-10 verbal numeric rating [Score] - Reported"
+  },
+  "subject": {
+    "reference": "Patient/7d57828f-a0a6-4470-a957-dca2bbb2ddae"
+  },
+  "encounter": {
+    "reference": "Encounter/b551dc26-b1bc-4583-a8d4-3e300ad26154"
+  },
+  "effectiveDateTime": "2014-05-22T14:01:57+00:00",
+  "issued": "2014-05-22T14:01:57.777+00:00",
+  "valueQuantity": {
+    "value": 2.73289626612661,
+    "unit": "{score}",
+    "system": "http://unitsofmeasure.org",
+    "code": "{score}"
+  }
+}

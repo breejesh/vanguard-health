@@ -1,0 +1,49 @@
+{
+  "resourceType": "Condition",
+  "id": "5fcb6508-e3e2-41f0-a221-0a1731327888",
+  "meta": {
+    "versionId": "4",
+    "lastUpdated": "2021-04-06T03:02:07.424-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "clinicalStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+        "code": "resolved"
+      }
+    ]
+  },
+  "verificationStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+        "code": "confirmed"
+      }
+    ]
+  },
+  "code": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "444814009",
+        "display": "Viral sinusitis (disorder)"
+      }
+    ],
+    "text": "Viral sinusitis (disorder)"
+  },
+  "subject": {
+    "reference": "Patient/07f741ce-220d-4744-b1ab-d28366110264"
+  },
+  "encounter": {
+    "reference": "Encounter/42c18376-9f25-41d3-a8ab-5fdaead95af3"
+  },
+  "onsetDateTime": "2015-04-03T11:19:33+00:00",
+  "abatementDateTime": "2015-04-10T11:19:33+00:00",
+  "recordedDate": "2015-04-03T11:19:33+00:00"
+}

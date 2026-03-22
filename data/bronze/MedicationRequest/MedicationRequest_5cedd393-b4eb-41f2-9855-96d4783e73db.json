@@ -1,0 +1,42 @@
+{
+  "resourceType": "MedicationRequest",
+  "id": "5cedd393-b4eb-41f2-9855-96d4783e73db",
+  "meta": {
+    "versionId": "3",
+    "lastUpdated": "2021-04-06T03:05:27.547-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "stopped",
+  "intent": "order",
+  "medicationCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "code": "849574",
+        "display": "Naproxen sodium 220 MG Oral Tablet"
+      }
+    ],
+    "text": "Naproxen sodium 220 MG Oral Tablet"
+  },
+  "subject": {
+    "reference": "Patient/09075876-bd10-46cf-9455-d55dc7df9f59"
+  },
+  "encounter": {
+    "reference": "Encounter/744a49c6-3478-4832-8136-9d2b969c3545"
+  },
+  "authoredOn": "2013-06-29T19:32:30+00:00",
+  "requester": {
+    "reference": "Practitioner/37881086-7b05-4b18-a279-08e331f50e9b"
+  },
+  "dosageInstruction": [
+    {
+      "sequence": 1,
+      "asNeededBoolean": true
+    }
+  ]
+}

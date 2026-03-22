@@ -1,0 +1,50 @@
+{
+  "resourceType": "Observation",
+  "id": "2eed762b-893c-415f-8d67-8e65b49e0199",
+  "meta": {
+    "versionId": "4",
+    "lastUpdated": "2021-04-06T03:01:34.722-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+          "code": "laboratory",
+          "display": "laboratory"
+        }
+      ]
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "4548-4",
+        "display": "Hemoglobin A1c/Hemoglobin.total in Blood"
+      }
+    ],
+    "text": "Hemoglobin A1c/Hemoglobin.total in Blood"
+  },
+  "subject": {
+    "reference": "Patient/1d4685c4-e83e-4a73-a8e5-147a4c0b4ed4"
+  },
+  "encounter": {
+    "reference": "Encounter/5916f6df-eee1-4ed8-88f3-8783ab9b9056"
+  },
+  "effectiveDateTime": "1976-02-16T23:11:46+00:00",
+  "issued": "1976-02-16T23:11:46.059+00:00",
+  "valueQuantity": {
+    "value": 3.837063414120573,
+    "unit": "%",
+    "system": "http://unitsofmeasure.org",
+    "code": "%"
+  }
+}

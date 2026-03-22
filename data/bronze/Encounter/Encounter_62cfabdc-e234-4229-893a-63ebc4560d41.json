@@ -1,0 +1,48 @@
+{
+  "resourceType": "Encounter",
+  "id": "62cfabdc-e234-4229-893a-63ebc4560d41",
+  "meta": {
+    "versionId": "4",
+    "lastUpdated": "2021-04-07T03:09:40.246-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "finished",
+  "class": {
+    "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+    "code": "AMB"
+  },
+  "type": [
+    {
+      "coding": [
+        {
+          "system": "http://snomed.info/sct",
+          "code": "371883000",
+          "display": "Outpatient procedure (procedure)"
+        }
+      ],
+      "text": "Outpatient procedure (procedure)"
+    }
+  ],
+  "subject": {
+    "reference": "Patient/7099b4c5-6f47-4293-9690-f2afb23b9dd6"
+  },
+  "participant": [
+    {
+      "individual": {
+        "reference": "Practitioner/6b9dfb87-3ffb-4a21-9709-2810aa418642"
+      }
+    }
+  ],
+  "period": {
+    "start": "2014-12-28T00:41:27+00:00",
+    "end": "2014-12-28T00:56:27+00:00"
+  },
+  "serviceProvider": {
+    "reference": "Organization/0f7f97f6-693c-3de9-8190-85feaf4632e2"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "resourceType": "Encounter",
+  "id": "f5e8a3a8-99f2-4a42-91d8-8b1d49f52271",
+  "meta": {
+    "versionId": "4",
+    "lastUpdated": "2021-04-07T03:09:35.222-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "finished",
+  "class": {
+    "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+    "code": "AMB"
+  },
+  "type": [
+    {
+      "coding": [
+        {
+          "system": "http://snomed.info/sct",
+          "code": "185349003",
+          "display": "Encounter for check up (procedure)"
+        }
+      ],
+      "text": "Encounter for check up (procedure)"
+    }
+  ],
+  "subject": {
+    "reference": "Patient/fa064acf-b7f1-4279-83d3-7a94686da7ba"
+  },
+  "participant": [
+    {
+      "individual": {
+        "reference": "Practitioner/21deb55c-2cda-4306-947d-001412452463"
+      }
+    }
+  ],
+  "period": {
+    "start": "1939-06-24T02:39:21+00:00",
+    "end": "1939-06-24T02:54:21+00:00"
+  },
+  "serviceProvider": {
+    "reference": "Organization/fd328395-ab1d-35c6-a2d0-d05a9a79cf11"
+  }
+}

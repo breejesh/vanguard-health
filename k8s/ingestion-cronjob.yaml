@@ -1,0 +1,49 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: fhir-ingestion
+  namespace: vanguard-health
+spec:
+  schedule: "0 */6 * * *"  # Every 6 hours
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 3600  # 1 hour timeout
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            app: fhir-ingestion
+        spec:
+          serviceAccountName: vanguard-sa
+          containers:
+          - name: ingestion
+            image: vanguard/ingestion:v1.0.0
+            imagePullPolicy: IfNotPresent
+            envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secrets
+            volumeMounts:
+            - name: data
+              mountPath: /mnt/data
+            - name: logs
+              mountPath: /app/logs
+            resources:
+              requests:
+                memory: "2Gi"
+                cpu: "1"
+              limits:
+                memory: "4Gi"
+                cpu: "2"
+          volumes:
+          - name: data
+            persistentVolumeClaim:
+              claimName: data-pvc
+          - name: logs
+            emptyDir: {}
+          restartPolicy: OnFailure

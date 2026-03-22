@@ -1,0 +1,50 @@
+{
+  "resourceType": "Observation",
+  "id": "52b9218b-33ec-4cc3-a5c2-b0f2e652eb8b",
+  "meta": {
+    "versionId": "3",
+    "lastUpdated": "2021-04-06T03:01:34.838-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+          "code": "laboratory",
+          "display": "laboratory"
+        }
+      ]
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "2093-3",
+        "display": "Total Cholesterol"
+      }
+    ],
+    "text": "Total Cholesterol"
+  },
+  "subject": {
+    "reference": "Patient/65b95f0a-e27d-4536-b04e-4e17a726ed38"
+  },
+  "encounter": {
+    "reference": "Encounter/e04c9ae7-d7d6-4236-8966-df1c49a0a592"
+  },
+  "effectiveDateTime": "2012-11-13T21:04:33+00:00",
+  "issued": "2012-11-13T21:04:33.558+00:00",
+  "valueQuantity": {
+    "value": 221.37886810107813,
+    "unit": "mg/dL",
+    "system": "http://unitsofmeasure.org",
+    "code": "mg/dL"
+  }
+}

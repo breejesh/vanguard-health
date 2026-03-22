@@ -1,0 +1,41 @@
+{
+  "resourceType": "MedicationRequest",
+  "id": "9c4192bb-ec07-4835-b793-c2fe02f7ee2a",
+  "meta": {
+    "versionId": "3",
+    "lastUpdated": "2021-04-06T03:05:30.516-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "stopped",
+  "intent": "order",
+  "medicationCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "code": "583214",
+        "display": "PACLitaxel 100 MG Injection"
+      }
+    ],
+    "text": "PACLitaxel 100 MG Injection"
+  },
+  "subject": {
+    "reference": "Patient/84afbe27-2a55-4f53-b1de-3513e21dae68"
+  },
+  "encounter": {
+    "reference": "Encounter/343b9b83-104c-493c-8f67-a988f87c3113"
+  },
+  "authoredOn": "1989-03-14T02:39:21+00:00",
+  "requester": {
+    "reference": "Practitioner/96333652-ed28-41d3-bb60-d435f478c8ed"
+  },
+  "reasonReference": [
+    {
+      "reference": "Condition/b8e6d63c-62f6-4305-9ba1-c792d464c11b"
+    }
+  ]
+}

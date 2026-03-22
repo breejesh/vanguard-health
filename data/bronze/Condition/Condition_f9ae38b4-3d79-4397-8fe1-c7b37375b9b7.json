@@ -1,0 +1,49 @@
+{
+  "resourceType": "Condition",
+  "id": "f9ae38b4-3d79-4397-8fe1-c7b37375b9b7",
+  "meta": {
+    "versionId": "3",
+    "lastUpdated": "2021-04-06T03:02:01.287-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "clinicalStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+        "code": "resolved"
+      }
+    ]
+  },
+  "verificationStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+        "code": "confirmed"
+      }
+    ]
+  },
+  "code": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "72892002",
+        "display": "Normal pregnancy"
+      }
+    ],
+    "text": "Normal pregnancy"
+  },
+  "subject": {
+    "reference": "Patient/b541fe39-8ec3-4f50-ac3c-9109374a1609"
+  },
+  "encounter": {
+    "reference": "Encounter/191ba64f-21ff-4747-b8a5-d19016270b72"
+  },
+  "onsetDateTime": "2013-03-18T03:43:05+00:00",
+  "abatementDateTime": "2013-04-08T03:43:05+00:00",
+  "recordedDate": "2013-03-18T03:43:05+00:00"
+}

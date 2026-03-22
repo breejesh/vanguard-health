@@ -1,0 +1,36 @@
+{
+  "resourceType": "MedicationRequest",
+  "id": "9774655b-51b6-465d-a389-d28cc9f5e281",
+  "meta": {
+    "versionId": "3",
+    "lastUpdated": "2021-04-06T03:05:19.796-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "stopped",
+  "intent": "order",
+  "medicationCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "code": "1860154",
+        "display": "Abuse-Deterrent 12 HR Oxycodone Hydrochloride 15 MG Extended Release Oral Tablet"
+      }
+    ],
+    "text": "Abuse-Deterrent 12 HR Oxycodone Hydrochloride 15 MG Extended Release Oral Tablet"
+  },
+  "subject": {
+    "reference": "Patient/326b4675-0bc8-4dbd-b406-a5564c282401"
+  },
+  "encounter": {
+    "reference": "Encounter/dbf113ec-aa7b-466f-ba1a-8a188a387e50"
+  },
+  "authoredOn": "2017-04-07T22:00:28+00:00",
+  "requester": {
+    "reference": "Practitioner/21deb55c-2cda-4306-947d-001412452463"
+  }
+}

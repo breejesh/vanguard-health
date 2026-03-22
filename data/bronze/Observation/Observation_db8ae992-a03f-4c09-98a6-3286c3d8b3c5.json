@@ -1,0 +1,50 @@
+{
+  "resourceType": "Observation",
+  "id": "db8ae992-a03f-4c09-98a6-3286c3d8b3c5",
+  "meta": {
+    "versionId": "3",
+    "lastUpdated": "2021-04-06T03:01:33.966-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+          "code": "laboratory",
+          "display": "laboratory"
+        }
+      ]
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "6690-2",
+        "display": "Leukocytes [#/volume] in Blood by Automated count"
+      }
+    ],
+    "text": "Leukocytes [#/volume] in Blood by Automated count"
+  },
+  "subject": {
+    "reference": "Patient/60c529cb-591e-47ee-a788-4981a407ccdf"
+  },
+  "encounter": {
+    "reference": "Encounter/b0ce522b-adbf-4958-bab9-5e61b6fc0a79"
+  },
+  "effectiveDateTime": "2019-01-16T16:43:46+00:00",
+  "issued": "2019-01-16T16:43:46.750+00:00",
+  "valueQuantity": {
+    "value": 8.6285505384627,
+    "unit": "10*3/uL",
+    "system": "http://unitsofmeasure.org",
+    "code": "10*3/uL"
+  }
+}

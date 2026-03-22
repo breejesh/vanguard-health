@@ -1,0 +1,50 @@
+{
+  "resourceType": "Observation",
+  "id": "daa731be-91d1-4e79-95e6-28e47d8ec6f1",
+  "meta": {
+    "versionId": "4",
+    "lastUpdated": "2021-04-06T03:01:32.490-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+          "code": "laboratory",
+          "display": "laboratory"
+        }
+      ]
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "789-8",
+        "display": "Erythrocytes [#/volume] in Blood by Automated count"
+      }
+    ],
+    "text": "Erythrocytes [#/volume] in Blood by Automated count"
+  },
+  "subject": {
+    "reference": "Patient/08bb5ad8-79b2-47ef-a0ad-81ef0b4ab2c3"
+  },
+  "encounter": {
+    "reference": "Encounter/77a210a8-3788-4968-be0f-047c2555e26c"
+  },
+  "effectiveDateTime": "2000-06-17T07:44:08+00:00",
+  "issued": "2000-06-17T07:44:08.416+00:00",
+  "valueQuantity": {
+    "value": 4.421156979908115,
+    "unit": "10*6/uL",
+    "system": "http://unitsofmeasure.org",
+    "code": "10*6/uL"
+  }
+}

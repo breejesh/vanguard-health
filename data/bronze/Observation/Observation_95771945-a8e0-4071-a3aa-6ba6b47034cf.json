@@ -1,0 +1,50 @@
+{
+  "resourceType": "Observation",
+  "id": "95771945-a8e0-4071-a3aa-6ba6b47034cf",
+  "meta": {
+    "versionId": "3",
+    "lastUpdated": "2021-04-06T03:01:32.499-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+          "code": "laboratory",
+          "display": "laboratory"
+        }
+      ]
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "49765-1",
+        "display": "Calcium"
+      }
+    ],
+    "text": "Calcium"
+  },
+  "subject": {
+    "reference": "Patient/c6e10999-2d4f-405d-964c-2e61f0aebd76"
+  },
+  "encounter": {
+    "reference": "Encounter/940d4fd0-78bd-4610-b99c-eb20163bb13e"
+  },
+  "effectiveDateTime": "2020-01-19T04:08:33+00:00",
+  "issued": "2020-01-19T04:08:33.294+00:00",
+  "valueQuantity": {
+    "value": 10.110389950805006,
+    "unit": "mg/dL",
+    "system": "http://unitsofmeasure.org",
+    "code": "mg/dL"
+  }
+}

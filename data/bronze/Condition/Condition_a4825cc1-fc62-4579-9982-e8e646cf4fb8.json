@@ -1,0 +1,48 @@
+{
+  "resourceType": "Condition",
+  "id": "a4825cc1-fc62-4579-9982-e8e646cf4fb8",
+  "meta": {
+    "versionId": "3",
+    "lastUpdated": "2021-04-06T03:01:56.749-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "clinicalStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+        "code": "active"
+      }
+    ]
+  },
+  "verificationStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+        "code": "confirmed"
+      }
+    ]
+  },
+  "code": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "22298006",
+        "display": "Myocardial Infarction"
+      }
+    ],
+    "text": "Myocardial Infarction"
+  },
+  "subject": {
+    "reference": "Patient/39234650-0229-4aee-975b-c8ee68bab40b"
+  },
+  "encounter": {
+    "reference": "Encounter/85bb1a41-6552-41f1-9abc-4a83c61713f2"
+  },
+  "onsetDateTime": "2016-12-10T02:39:21+00:00",
+  "recordedDate": "2016-12-10T02:39:21+00:00"
+}

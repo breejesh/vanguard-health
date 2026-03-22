@@ -1,0 +1,50 @@
+{
+  "resourceType": "Observation",
+  "id": "7dfaf46f-c360-4643-a71d-a10f2e2aa74c",
+  "meta": {
+    "versionId": "3",
+    "lastUpdated": "2021-04-06T03:01:33.731-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+          "code": "laboratory",
+          "display": "laboratory"
+        }
+      ]
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "6299-2",
+        "display": "Urea Nitrogen"
+      }
+    ],
+    "text": "Urea Nitrogen"
+  },
+  "subject": {
+    "reference": "Patient/5f6d256f-fc32-4b10-ba9c-51aba830cfa4"
+  },
+  "encounter": {
+    "reference": "Encounter/7420ecaf-ab42-437b-868a-74950a26233a"
+  },
+  "effectiveDateTime": "1995-02-25T05:46:40+00:00",
+  "issued": "1995-02-25T05:46:40.398+00:00",
+  "valueQuantity": {
+    "value": 17.57006046847424,
+    "unit": "mg/dL",
+    "system": "http://unitsofmeasure.org",
+    "code": "mg/dL"
+  }
+}

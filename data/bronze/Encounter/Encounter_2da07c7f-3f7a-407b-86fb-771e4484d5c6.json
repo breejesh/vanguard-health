@@ -1,0 +1,48 @@
+{
+  "resourceType": "Encounter",
+  "id": "2da07c7f-3f7a-407b-86fb-771e4484d5c6",
+  "meta": {
+    "versionId": "4",
+    "lastUpdated": "2021-04-07T03:09:36.504-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "finished",
+  "class": {
+    "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+    "code": "AMB"
+  },
+  "type": [
+    {
+      "coding": [
+        {
+          "system": "http://snomed.info/sct",
+          "code": "308335008",
+          "display": "Patient encounter procedure"
+        }
+      ],
+      "text": "Patient encounter procedure"
+    }
+  ],
+  "subject": {
+    "reference": "Patient/004b7f3b-eaaa-4eda-81dc-3a82854a363d"
+  },
+  "participant": [
+    {
+      "individual": {
+        "reference": "Practitioner/4ce79e7a-ac65-4f77-9ddf-c53b1a1d40de"
+      }
+    }
+  ],
+  "period": {
+    "start": "2011-10-30T21:45:04+00:00",
+    "end": "2011-10-30T22:12:04+00:00"
+  },
+  "serviceProvider": {
+    "reference": "Organization/1eaf97fa-9de6-38de-a9c4-6efe5dc574be"
+  }
+}

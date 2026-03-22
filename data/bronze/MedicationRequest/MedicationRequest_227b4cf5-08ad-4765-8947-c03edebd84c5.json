@@ -1,0 +1,41 @@
+{
+  "resourceType": "MedicationRequest",
+  "id": "227b4cf5-08ad-4765-8947-c03edebd84c5",
+  "meta": {
+    "versionId": "3",
+    "lastUpdated": "2021-04-06T03:05:36.288-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "active",
+  "intent": "order",
+  "medicationCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "code": "1736776",
+        "display": "10 ML oxaliplatin 5 MG/ML Injection"
+      }
+    ],
+    "text": "10 ML oxaliplatin 5 MG/ML Injection"
+  },
+  "subject": {
+    "reference": "Patient/fb13e626-1400-45a1-9a99-29c6e7a0e8e4"
+  },
+  "encounter": {
+    "reference": "Encounter/bc9ff425-5385-4c87-94af-fdfac39b7a2f"
+  },
+  "authoredOn": "1995-09-10T21:51:36+00:00",
+  "requester": {
+    "reference": "Practitioner/b119e0a9-6b11-42c3-8a37-24c68f8eaa78"
+  },
+  "reasonReference": [
+    {
+      "reference": "Condition/e8983680-48a2-4b4d-b9b8-dec5603fd1eb"
+    }
+  ]
+}

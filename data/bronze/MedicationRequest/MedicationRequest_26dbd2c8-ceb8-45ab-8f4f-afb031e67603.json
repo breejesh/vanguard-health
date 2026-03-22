@@ -1,0 +1,42 @@
+{
+  "resourceType": "MedicationRequest",
+  "id": "26dbd2c8-ceb8-45ab-8f4f-afb031e67603",
+  "meta": {
+    "versionId": "3",
+    "lastUpdated": "2021-04-06T03:05:23.309-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "stopped",
+  "intent": "order",
+  "medicationCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "code": "282464",
+        "display": "Acetaminophen 160 MG Oral Tablet"
+      }
+    ],
+    "text": "Acetaminophen 160 MG Oral Tablet"
+  },
+  "subject": {
+    "reference": "Patient/95c0165c-f900-4b50-90db-8176b4fd935d"
+  },
+  "encounter": {
+    "reference": "Encounter/1ca55598-df83-481b-8d2b-9df57cfa07d7"
+  },
+  "authoredOn": "2019-02-04T11:17:47+00:00",
+  "requester": {
+    "reference": "Practitioner/22d56828-df1d-4739-82b9-45a3757b3a5f"
+  },
+  "dosageInstruction": [
+    {
+      "sequence": 1,
+      "asNeededBoolean": true
+    }
+  ]
+}

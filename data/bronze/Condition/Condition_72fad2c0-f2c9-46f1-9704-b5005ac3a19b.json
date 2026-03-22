@@ -1,0 +1,49 @@
+{
+  "resourceType": "Condition",
+  "id": "72fad2c0-f2c9-46f1-9704-b5005ac3a19b",
+  "meta": {
+    "versionId": "3",
+    "lastUpdated": "2021-04-06T03:02:07.587-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "clinicalStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+        "code": "resolved"
+      }
+    ]
+  },
+  "verificationStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+        "code": "confirmed"
+      }
+    ]
+  },
+  "code": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "68496003",
+        "display": "Polyp of colon"
+      }
+    ],
+    "text": "Polyp of colon"
+  },
+  "subject": {
+    "reference": "Patient/d64b37f5-d3b5-4c25-abe8-23ebe8f5a04e"
+  },
+  "encounter": {
+    "reference": "Encounter/017fd532-ff99-43e0-9f2f-7fe1000719e6"
+  },
+  "onsetDateTime": "2014-11-02T19:08:38+00:00",
+  "abatementDateTime": "2016-01-28T19:08:38+00:00",
+  "recordedDate": "2014-11-02T19:08:38+00:00"
+}

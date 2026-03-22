@@ -1,0 +1,36 @@
+{
+  "resourceType": "MedicationRequest",
+  "id": "fdd53e6c-c431-4a8c-8752-d219e0081323",
+  "meta": {
+    "versionId": "2",
+    "lastUpdated": "2021-04-06T03:05:23.334-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "active",
+  "intent": "order",
+  "medicationCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "code": "705129",
+        "display": "Nitroglycerin 0.4 MG/ACTUAT Mucosal Spray"
+      }
+    ],
+    "text": "Nitroglycerin 0.4 MG/ACTUAT Mucosal Spray"
+  },
+  "subject": {
+    "reference": "Patient/12edb5a0-ec71-45b7-aff6-0fef1c382881"
+  },
+  "encounter": {
+    "reference": "Encounter/fae7a4a7-8dd9-4c91-b559-a979df42516c"
+  },
+  "authoredOn": "1973-11-15T09:15:59+00:00",
+  "requester": {
+    "reference": "Practitioner/c02064be-1075-4027-a7eb-027c476ef3e4"
+  }
+}

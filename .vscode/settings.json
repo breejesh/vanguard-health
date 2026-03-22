@@ -1,0 +1,18 @@
+{
+    "workbench.editorAssociations": {
+        "*.copilotmd": "vscode.markdown.preview.editor",
+        "*.xls": "default",
+        "*.parquet": "duckdb.dataFileViewer",
+        "*.csv": "duckdb.dataFileViewer",
+        "*.tsv": "duckdb.dataFileViewer"
+    },
+    "duckdb.databases": [
+        {
+            "alias": "duckdb",
+            "type": "file",
+            "path": "f:\\My Data\\Academic\\GaTech\\IHI\\vanguard-health\\data\\duckdb.duckdb",
+            "attached": true
+        }
+    ],
+    "duckdb.defaultDatabase": "duckdb"
+}

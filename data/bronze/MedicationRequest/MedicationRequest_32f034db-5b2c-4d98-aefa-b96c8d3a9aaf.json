@@ -1,0 +1,41 @@
+{
+  "resourceType": "MedicationRequest",
+  "id": "32f034db-5b2c-4d98-aefa-b96c8d3a9aaf",
+  "meta": {
+    "versionId": "3",
+    "lastUpdated": "2021-04-06T03:05:20.786-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "active",
+  "intent": "order",
+  "medicationCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "code": "106892",
+        "display": "insulin human, isophane 70 UNT/ML / Regular Insulin, Human 30 UNT/ML Injectable Suspension [Humulin]"
+      }
+    ],
+    "text": "insulin human, isophane 70 UNT/ML / Regular Insulin, Human 30 UNT/ML Injectable Suspension [Humulin]"
+  },
+  "subject": {
+    "reference": "Patient/c6e10999-2d4f-405d-964c-2e61f0aebd76"
+  },
+  "encounter": {
+    "reference": "Encounter/9b6a8d4f-8fb6-4866-b138-2343622ed305"
+  },
+  "authoredOn": "2001-12-23T04:08:33+00:00",
+  "requester": {
+    "reference": "Practitioner/8b85559d-27de-4d4b-bea7-5a715164cb60"
+  },
+  "reasonReference": [
+    {
+      "reference": "Condition/6ad68581-9c4a-494d-9c53-1ca81774bbc1"
+    }
+  ]
+}

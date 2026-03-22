@@ -1,0 +1,59 @@
+{
+  "resourceType": "Encounter",
+  "id": "8f97ff3e-23dc-4bf8-99cb-5ccd97739a97",
+  "meta": {
+    "versionId": "4",
+    "lastUpdated": "2021-04-07T03:09:35.770-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "finished",
+  "class": {
+    "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+    "code": "AMB"
+  },
+  "type": [
+    {
+      "coding": [
+        {
+          "system": "http://snomed.info/sct",
+          "code": "185345009",
+          "display": "Encounter for symptom"
+        }
+      ],
+      "text": "Encounter for symptom"
+    }
+  ],
+  "subject": {
+    "reference": "Patient/1fc53917-6bc1-4f87-9008-c91e94f0e188"
+  },
+  "participant": [
+    {
+      "individual": {
+        "reference": "Practitioner/96333652-ed28-41d3-bb60-d435f478c8ed"
+      }
+    }
+  ],
+  "period": {
+    "start": "2018-08-28T13:45:42+00:00",
+    "end": "2018-08-28T14:00:42+00:00"
+  },
+  "reasonCode": [
+    {
+      "coding": [
+        {
+          "system": "http://snomed.info/sct",
+          "code": "75498004",
+          "display": "Acute bacterial sinusitis (disorder)"
+        }
+      ]
+    }
+  ],
+  "serviceProvider": {
+    "reference": "Organization/60457c13-adb2-3415-82c5-86ab5dab5f93"
+  }
+}

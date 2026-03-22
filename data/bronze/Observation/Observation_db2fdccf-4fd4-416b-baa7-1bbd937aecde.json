@@ -1,0 +1,82 @@
+{
+  "resourceType": "Observation",
+  "id": "db2fdccf-4fd4-416b-baa7-1bbd937aecde",
+  "meta": {
+    "versionId": "4",
+    "lastUpdated": "2021-04-06T03:01:35.036-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+          "code": "vital-signs",
+          "display": "vital-signs"
+        }
+      ]
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "55284-4",
+        "display": "Blood Pressure"
+      }
+    ],
+    "text": "Blood Pressure"
+  },
+  "subject": {
+    "reference": "Patient/7c058fdc-75a9-4837-bedf-3bf1924311b7"
+  },
+  "encounter": {
+    "reference": "Encounter/8c336247-a32e-4d03-bae4-601fccf29196"
+  },
+  "effectiveDateTime": "2020-09-25T09:24:03+00:00",
+  "issued": "2020-09-25T09:24:03.908+00:00",
+  "component": [
+    {
+      "code": {
+        "coding": [
+          {
+            "system": "http://loinc.org",
+            "code": "8462-4",
+            "display": "Diastolic Blood Pressure"
+          }
+        ],
+        "text": "Diastolic Blood Pressure"
+      },
+      "valueQuantity": {
+        "value": 82.52107471801594,
+        "unit": "mm[Hg]",
+        "system": "http://unitsofmeasure.org",
+        "code": "mm[Hg]"
+      }
+    },
+    {
+      "code": {
+        "coding": [
+          {
+            "system": "http://loinc.org",
+            "code": "8480-6",
+            "display": "Systolic Blood Pressure"
+          }
+        ],
+        "text": "Systolic Blood Pressure"
+      },
+      "valueQuantity": {
+        "value": 110.9638933309432,
+        "unit": "mm[Hg]",
+        "system": "http://unitsofmeasure.org",
+        "code": "mm[Hg]"
+      }
+    }
+  ]
+}

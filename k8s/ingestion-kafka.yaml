@@ -1,0 +1,210 @@
+---
+# Kafka Producer Job - creates fetch tasks
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: fhir-ingestion-producer
+  namespace: vanguard-health
+spec:
+  schedule: "0 */6 * * *"  # Every 6 hours
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 600  # 10 minute timeout
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            app: fhir-ingestion-producer
+        spec:
+          serviceAccountName: vanguard-sa
+          containers:
+          - name: producer
+            image: vanguard/ingestion:v1.0.0
+            command: ["python", "-m", "src.ingestion.kafka_producer"]
+            envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secrets
+            env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "kafka:9092"
+            resources:
+              requests:
+                memory: "512Mi"
+                cpu: "500m"
+              limits:
+                memory: "1Gi"
+                cpu: "1"
+          restartPolicy: OnFailure
+---
+# Kafka Consumer Workers Deployment - fetches data in parallel
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fhir-fetch-workers
+  namespace: vanguard-health
+spec:
+  replicas: 4  # 4 parallel workers
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: fhir-fetch-worker
+  template:
+    metadata:
+      labels:
+        app: fhir-fetch-worker
+    spec:
+      serviceAccountName: vanguard-sa
+      containers:
+      - name: worker
+        image: vanguard/ingestion:v1.0.0
+        command: ["python", "-m", "src.ingestion.kafka_consumer"]
+        envFrom:
+        - configMapRef:
+            name: app-config
+        - secretRef:
+            name: app-secrets
+        env:
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: "kafka:9092"
+        volumeMounts:
+        - name: data
+          mountPath: /mnt/data
+        - name: logs
+          mountPath: /app/logs
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1"
+          limits:
+            memory: "4Gi"
+            cpu: "2"
+        livenessProbe:
+          exec:
+            command:
+            - python
+            - -c
+            - "import socket; socket.create_connection(('kafka', 9092), timeout=5)"
+          initialDelaySeconds: 30
+          periodSeconds: 30
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: data-pvc
+      - name: logs
+        emptyDir: {}
+---
+# Auto-trigger Spark job when ingestion completes
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: spark-trigger
+  namespace: vanguard-health
+spec:
+  schedule: "*/5 * * * *"  # Every 5 minutes check if Kafka tasks are done
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            app: spark-trigger
+        spec:
+          serviceAccountName: vanguard-sa
+          containers:
+          - name: trigger
+            image: bitnami/kubectl:latest
+            command:
+            - /bin/bash
+            - -c
+            - |
+              # Check if there are pending Kafka tasks
+              PENDING=$(kubectl logs -n vanguard-health deployment/fhir-fetch-workers --tail=100 2>/dev/null | grep -c "Received task" || echo "0")
+              
+              # Check if workers are idle (no recent processing)
+              RECENT=$(kubectl logs -n vanguard-health deployment/fhir-fetch-workers --since=2m 2>/dev/null | wc -l)
+              
+              if [ "$RECENT" -lt 5 ]; then
+                echo "Workers are idle - triggering Spark job"
+                kubectl create job --from=cronjob/spark-job-trigger spark-run-$(date +%s) -n vanguard-health
+              else
+                echo "Workers still processing - skipping Spark trigger"
+              fi
+            resources:
+              requests:
+                memory: "128Mi"
+                cpu: "100m"
+              limits:
+                memory: "256Mi"
+                cpu: "200m"
+          restartPolicy: OnFailure
+---
+# Manual Spark trigger CronJob (backup - can also run manually)
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: spark-job-trigger
+  namespace: vanguard-health
+spec:
+  schedule: "30 */6 * * *"  # 30 minutes after ingestion (every 6 hours)
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 86400
+      backoffLimit: 3
+      activeDeadlineSeconds: 7200
+      template:
+        metadata:
+          labels:
+            app: bronze-to-silver
+        spec:
+          serviceAccountName: vanguard-sa
+          containers:
+          - name: spark-driver
+            image: vanguard/spark-jobs:v1.0.0
+            command:
+            - spark-submit
+            - --master
+            - local[4]
+            - --driver-memory
+            - 2g
+            - --executor-memory
+            - 2g
+            - --conf
+            - spark.sql.extensions=org.apache.spark.sql.hudi.HoodieSparkSessionExtension
+            - src/spark_jobs/bronze_to_silver.py
+            envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secrets
+            volumeMounts:
+            - name: data
+              mountPath: /mnt/data
+            - name: logs
+              mountPath: /app/logs
+            resources:
+              requests:
+                memory: "4Gi"
+                cpu: "2"
+              limits:
+                memory: "8Gi"
+                cpu: "4"
+          volumes:
+          - name: data
+            persistentVolumeClaim:
+              claimName: data-pvc
+          - name: logs
+            emptyDir: {}
+          restartPolicy: Never

@@ -1,0 +1,48 @@
+{
+  "resourceType": "Condition",
+  "id": "0a5fb513-b7eb-45c2-8668-bd1ad607e9cf",
+  "meta": {
+    "versionId": "4",
+    "lastUpdated": "2021-04-06T03:01:49.687-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "clinicalStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+        "code": "active"
+      }
+    ]
+  },
+  "verificationStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+        "code": "confirmed"
+      }
+    ]
+  },
+  "code": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "94260004",
+        "display": "Secondary malignant neoplasm of colon"
+      }
+    ],
+    "text": "Secondary malignant neoplasm of colon"
+  },
+  "subject": {
+    "reference": "Patient/f49a43d9-bb72-4b37-a4a6-70df40c40c92"
+  },
+  "encounter": {
+    "reference": "Encounter/0c41ab0f-20f9-4db2-80bf-24a2a08b8777"
+  },
+  "onsetDateTime": "1988-04-16T02:39:21+00:00",
+  "recordedDate": "1988-04-16T02:39:21+00:00"
+}

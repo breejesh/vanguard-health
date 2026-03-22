@@ -1,0 +1,55 @@
+{
+  "generated_at": "2026-03-22T21:59:20.982327",
+  "h3_resolution": 10,
+  "h3_cells": {
+    "8a2a33d5624ffff": {
+      "city": "Hopkinton",
+      "state": "Massachusetts",
+      "latitude": 42.224188056079754,
+      "longitude": -71.5408071843967
+    },
+    "8a2a3066cb27fff": {
+      "city": "Boston",
+      "state": "Massachusetts",
+      "latitude": 42.332220163230396,
+      "longitude": -71.01976949714202
+    },
+    "8a2a1483461ffff": {
+      "city": "West Springfield Town",
+      "state": "Massachusetts",
+      "latitude": 42.12518816169088,
+      "longitude": -72.64998351933917
+    },
+    "8a2a3075a00ffff": {
+      "city": "Medford",
+      "state": "Massachusetts",
+      "latitude": 42.424368004822256,
+      "longitude": -71.10911448164266
+    },
+    "8a2a30675857fff": {
+      "city": "Somerville",
+      "state": "Massachusetts",
+      "latitude": 42.39094014678313,
+      "longitude": -71.10071221645421
+    },
+    "8a2a1491c817fff": {
+      "city": "Chicopee",
+      "state": "Massachusetts",
+      "latitude": 42.17579199285011,
+      "longitude": -72.57153386093403
+    },
+    "8a2a30763377fff": {
+      "city": "Lynn",
+      "state": "Massachusetts",
+      "latitude": 42.475166472344306,
+      "longitude": -70.96252534582216
+    },
+    "8a2a300710effff": {
+      "city": "Gloucester",
+      "state": "Massachusetts",
+      "latitude": 42.629444612123926,
+      "longitude": -70.68579272492578
+    }
+  },
+  "total_unique": 8
+}

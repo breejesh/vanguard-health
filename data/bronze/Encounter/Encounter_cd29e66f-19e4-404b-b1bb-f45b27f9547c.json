@@ -1,0 +1,59 @@
+{
+  "resourceType": "Encounter",
+  "id": "cd29e66f-19e4-404b-b1bb-f45b27f9547c",
+  "meta": {
+    "versionId": "4",
+    "lastUpdated": "2021-04-06T03:13:04.467-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "finished",
+  "class": {
+    "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+    "code": "AMB"
+  },
+  "type": [
+    {
+      "coding": [
+        {
+          "system": "http://snomed.info/sct",
+          "code": "394701000",
+          "display": "Asthma follow-up"
+        }
+      ],
+      "text": "Asthma follow-up"
+    }
+  ],
+  "subject": {
+    "reference": "Patient/3be268d8-ec01-471a-937d-267bf0ed0b5c"
+  },
+  "participant": [
+    {
+      "individual": {
+        "reference": "Practitioner/a1b28730-eedd-4efa-870e-a70af74fec46"
+      }
+    }
+  ],
+  "period": {
+    "start": "2017-08-01T03:39:04+00:00",
+    "end": "2017-08-01T03:54:04+00:00"
+  },
+  "reasonCode": [
+    {
+      "coding": [
+        {
+          "system": "http://snomed.info/sct",
+          "code": "195967001",
+          "display": "Asthma"
+        }
+      ]
+    }
+  ],
+  "serviceProvider": {
+    "reference": "Organization/f1fbcbfb-fcfa-3bd2-b7f4-df20f1b3c3a4"
+  }
+}

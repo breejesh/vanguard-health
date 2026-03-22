@@ -1,0 +1,36 @@
+{
+  "resourceType": "MedicationRequest",
+  "id": "146e5f8b-c6b8-4e35-a575-8284bf792a0e",
+  "meta": {
+    "versionId": "4",
+    "lastUpdated": "2021-04-06T03:05:24.863-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "stopped",
+  "intent": "order",
+  "medicationCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "code": "1049221",
+        "display": "Acetaminophen 325 MG / Oxycodone Hydrochloride 5 MG Oral Tablet"
+      }
+    ],
+    "text": "Acetaminophen 325 MG / Oxycodone Hydrochloride 5 MG Oral Tablet"
+  },
+  "subject": {
+    "reference": "Patient/8318d9af-a7fc-4955-ac57-07b69f2e886f"
+  },
+  "encounter": {
+    "reference": "Encounter/e675d24d-bf3b-4140-8092-7d2fe1c19c8a"
+  },
+  "authoredOn": "2015-02-15T12:53:47+00:00",
+  "requester": {
+    "reference": "Practitioner/30793bd7-6605-40fe-bc4f-f41957b72d53"
+  }
+}

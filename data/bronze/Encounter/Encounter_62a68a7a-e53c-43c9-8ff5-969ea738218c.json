@@ -1,0 +1,59 @@
+{
+  "resourceType": "Encounter",
+  "id": "62a68a7a-e53c-43c9-8ff5-969ea738218c",
+  "meta": {
+    "versionId": "4",
+    "lastUpdated": "2021-04-07T03:09:33.851-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "finished",
+  "class": {
+    "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+    "code": "AMB"
+  },
+  "type": [
+    {
+      "coding": [
+        {
+          "system": "http://snomed.info/sct",
+          "code": "448337001",
+          "display": "Telemedicine consultation with patient"
+        }
+      ],
+      "text": "Telemedicine consultation with patient"
+    }
+  ],
+  "subject": {
+    "reference": "Patient/9acbf6dd-e2b1-42cd-9a8b-259b519491d6"
+  },
+  "participant": [
+    {
+      "individual": {
+        "reference": "Practitioner/8b85559d-27de-4d4b-bea7-5a715164cb60"
+      }
+    }
+  ],
+  "period": {
+    "start": "2009-02-08T17:41:27+00:00",
+    "end": "2009-02-08T17:56:27+00:00"
+  },
+  "reasonCode": [
+    {
+      "coding": [
+        {
+          "system": "http://snomed.info/sct",
+          "code": "88805009",
+          "display": "Chronic congestive heart failure (disorder)"
+        }
+      ]
+    }
+  ],
+  "serviceProvider": {
+    "reference": "Organization/f71ce1a9-cca7-3295-9a1e-c88ac3479b6f"
+  }
+}

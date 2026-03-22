@@ -1,0 +1,48 @@
+{
+  "resourceType": "Condition",
+  "id": "1ceef81c-8743-45b3-a6e5-55c7ab879c2f",
+  "meta": {
+    "versionId": "4",
+    "lastUpdated": "2021-04-06T03:01:51.431-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "clinicalStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+        "code": "active"
+      }
+    ]
+  },
+  "verificationStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+        "code": "confirmed"
+      }
+    ]
+  },
+  "code": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "185086009",
+        "display": "Chronic obstructive bronchitis (disorder)"
+      }
+    ],
+    "text": "Chronic obstructive bronchitis (disorder)"
+  },
+  "subject": {
+    "reference": "Patient/af82ad91-b8d4-46cc-96f2-645da53763f1"
+  },
+  "encounter": {
+    "reference": "Encounter/10561625-dd34-4b8d-8699-c87aebfc5595"
+  },
+  "onsetDateTime": "1963-09-23T23:11:46+00:00",
+  "recordedDate": "1963-09-23T23:11:46+00:00"
+}

@@ -1,0 +1,42 @@
+{
+  "resourceType": "MedicationRequest",
+  "id": "5db6f781-5f2c-4251-bf88-e6206b26b7c7",
+  "meta": {
+    "versionId": "4",
+    "lastUpdated": "2021-04-06T03:05:41.112-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "active",
+  "intent": "order",
+  "medicationCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "code": "1049630",
+        "display": "diphenhydrAMINE Hydrochloride 25 MG Oral Tablet"
+      }
+    ],
+    "text": "diphenhydrAMINE Hydrochloride 25 MG Oral Tablet"
+  },
+  "subject": {
+    "reference": "Patient/dbaeb336-8fb6-44dd-9606-6ccb4114074b"
+  },
+  "encounter": {
+    "reference": "Encounter/199fd8e9-d811-4aba-ac6e-f9e9bd17e216"
+  },
+  "authoredOn": "1977-09-22T23:25:08+00:00",
+  "requester": {
+    "reference": "Practitioner/b119e0a9-6b11-42c3-8a37-24c68f8eaa78"
+  },
+  "dosageInstruction": [
+    {
+      "sequence": 1,
+      "asNeededBoolean": true
+    }
+  ]
+}

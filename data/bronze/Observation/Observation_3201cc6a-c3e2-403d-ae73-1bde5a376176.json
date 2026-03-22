@@ -1,0 +1,50 @@
+{
+  "resourceType": "Observation",
+  "id": "3201cc6a-c3e2-403d-ae73-1bde5a376176",
+  "meta": {
+    "versionId": "3",
+    "lastUpdated": "2021-04-06T03:01:33.933-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+          "code": "laboratory",
+          "display": "laboratory"
+        }
+      ]
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "6298-4",
+        "display": "Potassium"
+      }
+    ],
+    "text": "Potassium"
+  },
+  "subject": {
+    "reference": "Patient/010fd829-1ef3-49c9-98c4-df7561709bc7"
+  },
+  "encounter": {
+    "reference": "Encounter/1f297900-066c-460d-a40b-0b8574df456e"
+  },
+  "effectiveDateTime": "2015-10-20T13:40:17+00:00",
+  "issued": "2015-10-20T13:40:17.384+00:00",
+  "valueQuantity": {
+    "value": 3.9258376929913195,
+    "unit": "mmol/L",
+    "system": "http://unitsofmeasure.org",
+    "code": "mmol/L"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "resourceType": "Condition",
+  "id": "f442b726-9345-41de-89ae-4657c01affd6",
+  "meta": {
+    "versionId": "5",
+    "lastUpdated": "2021-04-06T03:02:06.089-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "clinicalStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+        "code": "active"
+      }
+    ]
+  },
+  "verificationStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+        "code": "confirmed"
+      }
+    ]
+  },
+  "code": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "162864005",
+        "display": "Body mass index 30+ - obesity (finding)"
+      }
+    ],
+    "text": "Body mass index 30+ - obesity (finding)"
+  },
+  "subject": {
+    "reference": "Patient/74bbd61f-8017-4274-a156-8e31a96ec0d3"
+  },
+  "encounter": {
+    "reference": "Encounter/9c731595-6c0a-427e-8a41-a2417c773f3a"
+  },
+  "onsetDateTime": "2011-04-27T22:58:06+00:00",
+  "recordedDate": "2011-04-27T22:58:06+00:00"
+}

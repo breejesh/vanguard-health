@@ -1,0 +1,48 @@
+{
+  "resourceType": "Condition",
+  "id": "5fac8b4e-3b45-46a4-a2b2-509d08feeacc",
+  "meta": {
+    "versionId": "4",
+    "lastUpdated": "2021-04-06T03:01:51.566-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "clinicalStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+        "code": "active"
+      }
+    ]
+  },
+  "verificationStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+        "code": "confirmed"
+      }
+    ]
+  },
+  "code": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "55822004",
+        "display": "Hyperlipidemia"
+      }
+    ],
+    "text": "Hyperlipidemia"
+  },
+  "subject": {
+    "reference": "Patient/11f2a4d0-59e9-48ca-9495-6d0da2498d66"
+  },
+  "encounter": {
+    "reference": "Encounter/14fd540b-740d-40ac-9447-3aac3ee31536"
+  },
+  "onsetDateTime": "2002-01-29T03:15:25+00:00",
+  "recordedDate": "2002-01-29T03:15:25+00:00"
+}

@@ -1,0 +1,49 @@
+{
+  "resourceType": "Condition",
+  "id": "2c2d3e7d-2c22-4e3e-87a1-ccf1eb53a16c",
+  "meta": {
+    "versionId": "3",
+    "lastUpdated": "2021-04-06T03:01:57.583-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "clinicalStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+        "code": "resolved"
+      }
+    ]
+  },
+  "verificationStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+        "code": "confirmed"
+      }
+    ]
+  },
+  "code": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "10509002",
+        "display": "Acute bronchitis (disorder)"
+      }
+    ],
+    "text": "Acute bronchitis (disorder)"
+  },
+  "subject": {
+    "reference": "Patient/786ec762-c52d-4f65-bd73-0119a0184e80"
+  },
+  "encounter": {
+    "reference": "Encounter/a90c3daf-2f0c-4a43-9ba0-10f3df9a99cf"
+  },
+  "onsetDateTime": "2012-10-13T19:59:36+00:00",
+  "abatementDateTime": "2012-10-27T19:59:36+00:00",
+  "recordedDate": "2012-10-13T19:59:36+00:00"
+}
