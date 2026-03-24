@@ -1,0 +1,43 @@
+{
+  "resourceType": "MedicationRequest",
+  "id": "07196b20-7c47-47e3-a6f6-bd55e09b8abf",
+  "meta": {
+    "versionId": "8",
+    "lastUpdated": "2026-03-06T02:08:44.435-05:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "stopped",
+  "intent": "order",
+  "medicationCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "code": "562251",
+        "display": "Amoxicillin 250 MG / Clavulanate 125 MG Oral Tablet"
+      }
+    ],
+    "text": "Amoxicillin 250 MG / Clavulanate 125 MG Oral Tablet"
+  },
+  "subject": {
+    "reference": "Patient/274b7371-cb91-4b85-82a2-eabc4aa77779"
+  },
+  "encounter": {
+    "reference": "Encounter/0da4d08e-35a3-4a12-af05-eac5e90a5666"
+  },
+  "authoredOn": "2014-12-16T20:33:20+00:00",
+  "requester": {
+    "reference": "Practitioner/a6ba35b7-22d7-4bea-b87b-afbc9ff2f2ee"
+  },
+  "reasonReference": [
+    {
+      "reference": "Condition/0167f536-7e62-4001-845f-d94a6dc2d8ec"
+    }
+  ],
+  "ingestion_timestamp": "2026-03-24T05:53:04.973104",
+  "ingestion_date": "2026-03-24"
+}

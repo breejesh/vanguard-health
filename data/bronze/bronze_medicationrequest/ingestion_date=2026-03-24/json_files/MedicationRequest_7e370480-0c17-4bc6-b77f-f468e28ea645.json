@@ -1,0 +1,43 @@
+{
+  "resourceType": "MedicationRequest",
+  "id": "7e370480-0c17-4bc6-b77f-f468e28ea645",
+  "meta": {
+    "versionId": "6",
+    "lastUpdated": "2025-09-27T03:14:06.789-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "stopped",
+  "intent": "order",
+  "medicationCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "code": "834102",
+        "display": "Penicillin V Potassium 500 MG Oral Tablet"
+      }
+    ],
+    "text": "Penicillin V Potassium 500 MG Oral Tablet"
+  },
+  "subject": {
+    "reference": "Patient/0fc1eab4-7b07-4203-9fa3-34a965a25b2a"
+  },
+  "encounter": {
+    "reference": "Encounter/389bc10c-4ec7-4fd8-80bf-d833c642e460"
+  },
+  "authoredOn": "2016-12-06T10:31:59+00:00",
+  "requester": {
+    "reference": "Practitioner/c0ee937a-ff26-4d70-8a32-e5e2ab9be7ec"
+  },
+  "reasonReference": [
+    {
+      "reference": "Condition/08ee90eb-7cb7-42e1-9af0-4c000db7b783"
+    }
+  ],
+  "ingestion_timestamp": "2026-03-24T05:53:04.955187",
+  "ingestion_date": "2026-03-24"
+}

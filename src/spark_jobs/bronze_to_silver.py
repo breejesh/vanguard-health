@@ -10,7 +10,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Tuple
 from pyspark.sql import SparkSession, DataFrame
-from pyspark.sql.functions import col, from_json, schema_of_json, explode_outer, current_timestamp
+from pyspark.sql.functions import col, from_json, schema_of_json, explode_outer, current_timestamp, get_json_object, when
 
 # Add src to path
 sys.path.insert(0, '/app')
@@ -73,17 +73,24 @@ def read_bronze_jsonl(spark: SparkSession, resource_type: str) -> DataFrame:
 def transform_patients(bronze_patient_df: DataFrame) -> DataFrame:
     """Transform Patient resource from Bronze to Silver schema."""
     try:
-        silver_patient = bronze_patient_df.select(
-            col("id").alias("patient_id"),
-            col("name[0].text").alias("name"),
-            col("birthDate").alias("dob"),
-            col("gender").alias("gender"),
-            col("address[0].city").alias("city"),
-            col("address[0].state").alias("state"),
-            col("telecom[0].value").alias("phone"),
-            col("_hoodie_commit_time").cast("timestamp").alias("created_at"),
-            current_timestamp().alias("updated_at")
-        ).drop_duplicates(["patient_id"])
+        # Register as SQL view for easier nested access
+        bronze_patient_df.createOrReplaceTempView("patients_bronze")
+        
+        # Use SQL to safely extract nested fields - handles nulls and arrays
+        spark = bronze_patient_df.sparkSession
+        silver_patient = spark.sql("""
+            SELECT
+                id AS patient_id,
+                name[0].text AS name,
+                birthDate AS dob,
+                gender AS gender,
+                address[0].city AS city,
+                address[0].state AS state,
+                telecom[0].value AS phone,
+                CAST(_hoodie_commit_time AS TIMESTAMP) AS created_at,
+                CURRENT_TIMESTAMP() AS updated_at
+            FROM patients_bronze
+        """).drop_duplicates(["patient_id"])
         
         logger.info(f"Transformed {silver_patient.count()} patient records")
         return silver_patient
@@ -96,15 +103,20 @@ def transform_patients(bronze_patient_df: DataFrame) -> DataFrame:
 def transform_encounters(bronze_encounter_df: DataFrame) -> DataFrame:
     """Transform Encounter resource from Bronze to Silver schema."""
     try:
-        silver_encounter = bronze_encounter_df.select(
-            col("id").alias("encounter_id"),
-            col("subject.reference").alias("patient_id"),
-            col("period.start").cast("timestamp").alias("encounter_date"),
-            col("participant[0].individual.reference").alias("provider_id"),
-            col("reasonCode[0].coding[0].display").alias("diagnosis"),
-            col("_hoodie_commit_time").cast("timestamp").alias("created_at"),
-            current_timestamp().alias("updated_at")
-        ).drop_duplicates(["encounter_id"])
+        bronze_encounter_df.createOrReplaceTempView("encounters_bronze")
+        spark = bronze_encounter_df.sparkSession
+        
+        silver_encounter = spark.sql("""
+            SELECT
+                id AS encounter_id,
+                subject.reference AS patient_id,
+                CAST(period.start AS TIMESTAMP) AS encounter_date,
+                participant[0].individual.reference AS provider_id,
+                reasonCode[0].coding[0].display AS diagnosis,
+                CAST(_hoodie_commit_time AS TIMESTAMP) AS created_at,
+                CURRENT_TIMESTAMP() AS updated_at
+            FROM encounters_bronze
+        """).drop_duplicates(["encounter_id"])
         
         logger.info(f"Transformed {silver_encounter.count()} encounter records")
         return silver_encounter
@@ -117,18 +129,23 @@ def transform_encounters(bronze_encounter_df: DataFrame) -> DataFrame:
 def transform_observations(bronze_observation_df: DataFrame) -> DataFrame:
     """Transform Observation resource from Bronze to Silver schema."""
     try:
-        silver_observation = bronze_observation_df.select(
-            col("id").alias("obs_id"),
-            col("subject.reference").alias("patient_id"),
-            col("encounter.reference").alias("encounter_id"),
-            col("code.coding[0].code").alias("observation_code"),
-            col("code.coding[0].display").alias("observation_text"),
-            col("value.Quantity.value").alias("value"),
-            col("value.Quantity.unit").alias("unit"),
-            col("issued").cast("timestamp").alias("observation_time"),
-            col("_hoodie_commit_time").cast("timestamp").alias("created_at"),
-            current_timestamp().alias("updated_at")
-        ).drop_duplicates(["obs_id"])
+        bronze_observation_df.createOrReplaceTempView("observations_bronze")
+        spark = bronze_observation_df.sparkSession
+        
+        silver_observation = spark.sql("""
+            SELECT
+                id AS obs_id,
+                subject.reference AS patient_id,
+                encounter.reference AS encounter_id,
+                code.coding[0].code AS observation_code,
+                code.coding[0].display AS observation_text,
+                value.Quantity.value AS value,
+                value.Quantity.unit AS unit,
+                CAST(issued AS TIMESTAMP) AS observation_time,
+                CAST(_hoodie_commit_time AS TIMESTAMP) AS created_at,
+                CURRENT_TIMESTAMP() AS updated_at
+            FROM observations_bronze
+        """).drop_duplicates(["obs_id"])
         
         logger.info(f"Transformed {silver_observation.count()} observation records")
         return silver_observation
@@ -264,50 +281,44 @@ def transform_bronze_to_silver(bronze_path: str, silver_path: str) -> Tuple[int,
 
 
 def main():
-    """Main transformation pipeline."""
+    """Main transformation pipeline - pure Spark with Hudi."""
+    spark = None
     try:
-        logger.info("Starting Bronze to Silver transformation")
+        logger.info("🔥 Starting Bronze to Silver transformation (SPARK ONLY)")
         
         spark = create_spark_session()
         
         # Read Bronze tables
+        logger.info("Reading Bronze layer...")
         bronze_patient = read_bronze_table(spark, "Patient")
         bronze_encounter = read_bronze_table(spark, "Encounter")
         bronze_observation = read_bronze_table(spark, "Observation")
         
         # Transform
+        logger.info("Transforming Patient data...")
         if bronze_patient is not None:
             silver_patient = transform_patients(bronze_patient)
             write_silver_table(silver_patient, "silver_patient")
         
+        logger.info("Transforming Encounter data...")
         if bronze_encounter is not None:
             silver_encounter = transform_encounters(bronze_encounter)
             write_silver_table(silver_encounter, "silver_encounter")
         
+        logger.info("Transforming Observation data...")
         if bronze_observation is not None:
             silver_observation = transform_observations(bronze_observation)
             write_silver_table(silver_observation, "silver_observation")
         
-        # Record completion (optional - only if metadata manager is available)
-        if HAS_METADATA_MANAGER:
-            try:
-                metadata_manager = MetadataManager(config.MONGODB_URI, config.MONGODB_DB)
-                metadata_manager.record_job(
-                    "bronze_to_silver_transformation",
-                    "completed",
-                    0
-                )
-            except Exception as e:
-                logger.warning(f"Could not record job status: {e}")
-        
-        logger.info("Bronze to Silver transformation completed successfully")
+        logger.info("✅ Bronze to Silver transformation COMPLETED")
         return 0
         
     except Exception as e:
-        logger.error(f"Error in transformation pipeline: {e}", exc_info=True)
+        logger.error(f"❌ Spark transformation failed: {e}", exc_info=True)
         return 1
     finally:
-        spark.stop()
+        if spark:
+            spark.stop()
 
 
 if __name__ == "__main__":

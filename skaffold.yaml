@@ -1,0 +1,89 @@
+apiVersion: skaffold/v4beta6
+kind: Config
+metadata:
+  name: vanguard-health
+
+build:
+  artifacts:
+    - image: vanguard/ingestion
+      docker:
+        dockerfile: docker/Dockerfile.ingestion
+      sync:
+        manual:
+          - src: "src/ingestion/**/*.py"
+            dest: /app/src/ingestion
+          - src: "src/common/**/*.py"
+            dest: /app/src/common
+          - src: "config/**/*"
+            dest: /app/config
+
+    - image: vanguard/pipeline-orchestrator
+      docker:
+        dockerfile: docker/Dockerfile.orchestrator
+      sync:
+        manual:
+          - src: "src/common/**/*.py"
+            dest: /app/src/common
+          - src: "src/spark_jobs/**/*.py"
+            dest: /app/src/spark_jobs
+          - src: "config/**/*"
+            dest: /app/config
+
+    - image: vanguard/spark-jobs
+      docker:
+        dockerfile: docker/Dockerfile.spark
+      sync:
+        manual:
+          - src: "src/spark_jobs/**/*.py"
+            dest: /app/src/spark_jobs
+          - src: "src/common/**/*.py"
+            dest: /app/src/common
+          - src: "config/**/*"
+            dest: /app/config
+
+deploy:
+  kubectl:
+    defaultNamespace: vanguard-health
+
+manifests:
+  kustomize:
+    paths:
+      - k8s/overlays/dev
+
+profiles:
+  - name: dev
+    activation:
+      - command: dev
+    build:
+      local:
+        useBuildkit: true
+        concurrency: 3
+    manifests:
+      kustomize:
+        paths:
+          - k8s/overlays/dev
+    portForward:
+      - resourceType: deployment
+        resourceName: mongodb
+        port: 27017:27017
+        localPort: 27017
+      - resourceType: deployment
+        resourceName: kafka
+        port: 9092:9092
+        localPort: 9092
+      - resourceType: deployment
+        resourceName: redis
+        port: 6379:6379
+        localPort: 6379
+
+  - name: prod
+    activation:
+      - command: run
+    build:
+      cluster:
+        projectId: vanguard-prod
+    manifests:
+      kustomize:
+        paths:
+          - k8s/overlays/prod
+

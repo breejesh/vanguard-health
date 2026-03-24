@@ -1,27 +1,39 @@
-FROM apache/spark:3.3.2-python3
+FROM apache/spark:3.5.0
 
 USER root
 
-# Install additional dependencies
-RUN pip install --no-cache-dir \
+# Install Python dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl wget && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Python packages
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir \
     pymongo==4.5.0 \
     redis==5.0.0 \
-    firebase-admin==6.2.0 \
     python-dotenv==1.0.0 \
-    pydantic==2.0.2
+    pydantic==2.0.2 \
+    pyarrow==12.0.0
+
+# Download Hudi JAR for Spark 3.5.0
+RUN mkdir -p /opt/hudi && \
+    curl -sSL "https://repo.maven.apache.org/maven2/org/apache/hudi/hudi-spark3.5-bundle_2.12/1.0.0/hudi-spark3.5-bundle_2.12-1.0.0.jar" \
+    -o /opt/hudi/hudi-spark-bundle.jar
 
 WORKDIR /app
 
 # Copy application code
 COPY src/ ./src/
 COPY config/ ./config/
-COPY docker/requirements.txt .
-
-RUN pip install --no-cache-dir -r requirements.txt
 
 ENV PYTHONPATH=/app
+ENV SPARK_HOME=/opt/spark
+ENV PATH=$SPARK_HOME/bin:$PATH
 
-USER spark
-
-# Run Spark job via spark-submit
-ENTRYPOINT ["spark-submit"]
+# Run Spark job with Hudi JAR in classpath - use full path to spark-submit
+CMD /opt/spark/bin/spark-submit \
+    --master local[*] \
+    --driver-memory 512m \
+    --jars /opt/hudi/hudi-spark-bundle.jar \
+    /app/src/spark_jobs/bronze_to_silver.py

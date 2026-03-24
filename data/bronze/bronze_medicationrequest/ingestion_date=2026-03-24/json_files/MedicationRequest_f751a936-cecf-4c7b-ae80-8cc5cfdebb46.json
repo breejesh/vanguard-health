@@ -1,0 +1,38 @@
+{
+  "resourceType": "MedicationRequest",
+  "id": "f751a936-cecf-4c7b-ae80-8cc5cfdebb46",
+  "meta": {
+    "versionId": "6",
+    "lastUpdated": "2026-02-22T02:20:26.834-05:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "stopped",
+  "intent": "order",
+  "medicationCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "code": "749785",
+        "display": "Ortho Tri-Cyclen 28 Day Pack"
+      }
+    ],
+    "text": "Ortho Tri-Cyclen 28 Day Pack"
+  },
+  "subject": {
+    "reference": "Patient/a92edacf-c0ab-4fc4-931f-033a8d4bf314"
+  },
+  "encounter": {
+    "reference": "Encounter/f26240b1-695f-4f13-8195-afe0df479b49"
+  },
+  "authoredOn": "2010-10-20T10:00:37+00:00",
+  "requester": {
+    "reference": "Practitioner/c3c53ad9-4c82-406d-9b5b-b4f5e97e9410"
+  },
+  "ingestion_timestamp": "2026-03-24T05:53:04.964685",
+  "ingestion_date": "2026-03-24"
+}

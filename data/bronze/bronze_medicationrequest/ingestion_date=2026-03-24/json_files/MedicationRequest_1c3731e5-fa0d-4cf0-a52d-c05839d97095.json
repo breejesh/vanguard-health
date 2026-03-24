@@ -1,0 +1,38 @@
+{
+  "resourceType": "MedicationRequest",
+  "id": "1c3731e5-fa0d-4cf0-a52d-c05839d97095",
+  "meta": {
+    "versionId": "13",
+    "lastUpdated": "2026-02-23T02:27:22.413-05:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "active",
+  "intent": "order",
+  "medicationCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "code": "897718",
+        "display": "Verapamil Hydrochloride 40 MG"
+      }
+    ],
+    "text": "Verapamil Hydrochloride 40 MG"
+  },
+  "subject": {
+    "reference": "Patient/39234650-0229-4aee-975b-c8ee68bab40b"
+  },
+  "encounter": {
+    "reference": "Encounter/97ff0d73-2094-4598-a8a4-a18c350c1672"
+  },
+  "authoredOn": "1983-11-05T02:39:21+00:00",
+  "requester": {
+    "reference": "Practitioner/21deb55c-2cda-4306-947d-001412452463"
+  },
+  "ingestion_timestamp": "2026-03-24T05:53:04.968282",
+  "ingestion_date": "2026-03-24"
+}

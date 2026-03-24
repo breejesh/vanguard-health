@@ -1,0 +1,72 @@
+{
+  "resourceType": "MedicationRequest",
+  "id": "9fccfc69-3a5b-4393-af6e-12a9a7dda83a",
+  "meta": {
+    "versionId": "6",
+    "lastUpdated": "2025-09-14T03:11:10.701-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "stopped",
+  "intent": "order",
+  "medicationCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "code": "316672",
+        "display": "Simvistatin 10 MG"
+      }
+    ],
+    "text": "Simvistatin 10 MG"
+  },
+  "subject": {
+    "reference": "Patient/28d83205-7289-4483-a25d-877009825909"
+  },
+  "encounter": {
+    "reference": "Encounter/9f9b86ce-b414-49eb-87d4-773ac2e2a513"
+  },
+  "authoredOn": "2012-12-01T05:24:48+00:00",
+  "requester": {
+    "reference": "Practitioner/1cb51157-8083-410f-87d1-07a94629222a"
+  },
+  "reasonReference": [
+    {
+      "reference": "Condition/c9ae8ca1-91ed-4375-9c83-45441537541d"
+    }
+  ],
+  "dosageInstruction": [
+    {
+      "sequence": 1,
+      "timing": {
+        "repeat": {
+          "frequency": 1,
+          "period": 1,
+          "periodUnit": "d"
+        }
+      },
+      "asNeededBoolean": false,
+      "doseAndRate": [
+        {
+          "type": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/dose-rate-type",
+                "code": "ordered",
+                "display": "Ordered"
+              }
+            ]
+          },
+          "doseQuantity": {
+            "value": 1
+          }
+        }
+      ]
+    }
+  ],
+  "ingestion_timestamp": "2026-03-24T05:53:04.951938",
+  "ingestion_date": "2026-03-24"
+}

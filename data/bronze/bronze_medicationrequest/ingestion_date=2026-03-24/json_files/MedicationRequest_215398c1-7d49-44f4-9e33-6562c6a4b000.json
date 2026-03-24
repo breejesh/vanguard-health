@@ -1,0 +1,38 @@
+{
+  "resourceType": "MedicationRequest",
+  "id": "215398c1-7d49-44f4-9e33-6562c6a4b000",
+  "meta": {
+    "versionId": "6",
+    "lastUpdated": "2026-02-22T02:20:29.153-05:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "stopped",
+  "intent": "order",
+  "medicationCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "code": "748856",
+        "display": "Yaz 28 Day Pack"
+      }
+    ],
+    "text": "Yaz 28 Day Pack"
+  },
+  "subject": {
+    "reference": "Patient/a92edacf-c0ab-4fc4-931f-033a8d4bf314"
+  },
+  "encounter": {
+    "reference": "Encounter/4b4cf5b3-f437-48ba-a6ce-ef0b20279f5e"
+  },
+  "authoredOn": "2011-10-15T10:00:37+00:00",
+  "requester": {
+    "reference": "Practitioner/36a6e15b-7345-42ae-8a59-7a35059ebb47"
+  },
+  "ingestion_timestamp": "2026-03-24T05:53:04.964818",
+  "ingestion_date": "2026-03-24"
+}

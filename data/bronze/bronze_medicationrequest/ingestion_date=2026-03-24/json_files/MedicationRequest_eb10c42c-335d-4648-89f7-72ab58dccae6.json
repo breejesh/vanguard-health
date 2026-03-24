@@ -1,0 +1,38 @@
+{
+  "resourceType": "MedicationRequest",
+  "id": "eb10c42c-335d-4648-89f7-72ab58dccae6",
+  "meta": {
+    "versionId": "8",
+    "lastUpdated": "2025-09-11T03:15:30.729-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "stopped",
+  "intent": "order",
+  "medicationCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "code": "1310197",
+        "display": "Acetaminophen 300 MG / HYDROcodone Bitartrate 5 MG [Vicodin]"
+      }
+    ],
+    "text": "Acetaminophen 300 MG / HYDROcodone Bitartrate 5 MG [Vicodin]"
+  },
+  "subject": {
+    "reference": "Patient/a9fb0d0f-fb3c-4173-ad19-ec9ba84f4d02"
+  },
+  "encounter": {
+    "reference": "Encounter/dcb120e9-6bf5-467b-a858-c182f67c4b3c"
+  },
+  "authoredOn": "2010-03-31T11:06:44+00:00",
+  "requester": {
+    "reference": "Practitioner/0653c047-19b4-466e-a048-0b3917600b43"
+  },
+  "ingestion_timestamp": "2026-03-24T05:53:04.951167",
+  "ingestion_date": "2026-03-24"
+}

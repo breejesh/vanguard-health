@@ -1,0 +1,43 @@
+{
+  "resourceType": "MedicationRequest",
+  "id": "36892cfb-aee6-4efe-b502-c645a65efc3a",
+  "meta": {
+    "versionId": "6",
+    "lastUpdated": "2026-02-23T02:27:37.357-05:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "active",
+  "intent": "order",
+  "medicationCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "code": "896209",
+        "display": "60 ACTUAT Fluticasone propionate 0.25 MG/ACTUAT / salmeterol 0.05 MG/ACTUAT Dry Powder Inhaler"
+      }
+    ],
+    "text": "60 ACTUAT Fluticasone propionate 0.25 MG/ACTUAT / salmeterol 0.05 MG/ACTUAT Dry Powder Inhaler"
+  },
+  "subject": {
+    "reference": "Patient/f9fec38b-3c52-45de-bf48-53d5a993ce98"
+  },
+  "encounter": {
+    "reference": "Encounter/ddd235b0-7641-48f0-a662-71aee58a1ef8"
+  },
+  "authoredOn": "1951-07-07T02:39:21+00:00",
+  "requester": {
+    "reference": "Practitioner/21deb55c-2cda-4306-947d-001412452463"
+  },
+  "reasonReference": [
+    {
+      "reference": "Condition/08bf35d9-56f2-4ae8-817a-4a66ddfb6eac"
+    }
+  ],
+  "ingestion_timestamp": "2026-03-24T05:53:04.968581",
+  "ingestion_date": "2026-03-24"
+}

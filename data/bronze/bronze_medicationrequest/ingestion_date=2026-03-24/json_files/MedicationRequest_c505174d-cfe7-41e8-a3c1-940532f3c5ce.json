@@ -1,0 +1,38 @@
+{
+  "resourceType": "MedicationRequest",
+  "id": "c505174d-cfe7-41e8-a3c1-940532f3c5ce",
+  "meta": {
+    "versionId": "6",
+    "lastUpdated": "2025-09-24T00:49:20.808-04:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "stopped",
+  "intent": "order",
+  "medicationCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "code": "1359133",
+        "display": "Estrostep Fe 28 Day Pack"
+      }
+    ],
+    "text": "Estrostep Fe 28 Day Pack"
+  },
+  "subject": {
+    "reference": "Patient/a5d58f24-9689-4a44-a377-32708cae064c"
+  },
+  "encounter": {
+    "reference": "Encounter/a74959b8-f994-44f9-8677-ab3c7d25ba83"
+  },
+  "authoredOn": "2011-10-15T03:48:16+00:00",
+  "requester": {
+    "reference": "Practitioner/99111a26-5d57-480b-9af9-9bd645aa5e64"
+  },
+  "ingestion_timestamp": "2026-03-24T05:53:04.952699",
+  "ingestion_date": "2026-03-24"
+}

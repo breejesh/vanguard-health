@@ -1,0 +1,38 @@
+{
+  "resourceType": "MedicationRequest",
+  "id": "ff415492-967e-4833-9751-38f15bbb41a5",
+  "meta": {
+    "versionId": "6",
+    "lastUpdated": "2026-02-21T02:22:45.709-05:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "stopped",
+  "intent": "order",
+  "medicationCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "code": "309362",
+        "display": "Clopidogrel 75 MG Oral Tablet"
+      }
+    ],
+    "text": "Clopidogrel 75 MG Oral Tablet"
+  },
+  "subject": {
+    "reference": "Patient/fa064acf-b7f1-4279-83d3-7a94686da7ba"
+  },
+  "encounter": {
+    "reference": "Encounter/5103c432-ba39-4cc7-9572-fccca9394b27"
+  },
+  "authoredOn": "2020-09-26T02:39:21+00:00",
+  "requester": {
+    "reference": "Practitioner/96333652-ed28-41d3-bb60-d435f478c8ed"
+  },
+  "ingestion_timestamp": "2026-03-24T05:53:04.963236",
+  "ingestion_date": "2026-03-24"
+}

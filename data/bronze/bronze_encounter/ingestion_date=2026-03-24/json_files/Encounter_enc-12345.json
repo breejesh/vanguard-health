@@ -1,0 +1,50 @@
+{
+  "resourceType": "Encounter",
+  "id": "enc-12345",
+  "meta": {
+    "versionId": "256",
+    "lastUpdated": "2026-03-23T11:14:21.311-04:00"
+  },
+  "status": "finished",
+  "type": [
+    {
+      "coding": [
+        {
+          "system": "urn:oid:1.2.840.114350.1.13.90.2.7.10.698084.10110",
+          "code": "105",
+          "display": "Inpatient"
+        }
+      ],
+      "text": "Inpatient"
+    }
+  ],
+  "subject": {
+    "reference": "Patient/mdcalc1"
+  },
+  "period": {
+    "start": "2023-09-27",
+    "end": "2023-09-27"
+  },
+  "reasonCode": [
+    {
+      "coding": [
+        {
+          "system": "urn:oid:1.2.840.114350.1.13.90.3.7.2.728286",
+          "code": "100002",
+          "display": "Abdominal Pain"
+        }
+      ],
+      "text": "Abdominal Pain"
+    }
+  ],
+  "hospitalization": {
+    "extension": [
+      {
+        "url": "http://open.epic.com/FHIR/StructureDefinition/extension/ip-admit-datetime",
+        "valueDateTime": "2025-07-11T01:32:00Z"
+      }
+    ]
+  },
+  "ingestion_timestamp": "2026-03-24T05:52:57.463261",
+  "ingestion_date": "2026-03-24"
+}

@@ -1,0 +1,38 @@
+{
+  "resourceType": "MedicationRequest",
+  "id": "26ea01ef-1138-4cc6-bb9c-9d440526d4a4",
+  "meta": {
+    "versionId": "31",
+    "lastUpdated": "2026-02-23T02:28:35.219-05:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "stopped",
+  "intent": "order",
+  "medicationCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "code": "833036",
+        "display": "Captopril 25 MG Oral Tablet"
+      }
+    ],
+    "text": "Captopril 25 MG Oral Tablet"
+  },
+  "subject": {
+    "reference": "Patient/39234650-0229-4aee-975b-c8ee68bab40b"
+  },
+  "encounter": {
+    "reference": "Encounter/85bb1a41-6552-41f1-9abc-4a83c61713f2"
+  },
+  "authoredOn": "2016-12-10T02:39:21+00:00",
+  "requester": {
+    "reference": "Practitioner/96333652-ed28-41d3-bb60-d435f478c8ed"
+  },
+  "ingestion_timestamp": "2026-03-24T05:53:04.970087",
+  "ingestion_date": "2026-03-24"
+}

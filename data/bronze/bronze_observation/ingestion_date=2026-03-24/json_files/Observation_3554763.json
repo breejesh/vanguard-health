@@ -1,0 +1,43 @@
+{
+  "resourceType": "Observation",
+  "id": "3554763",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2026-03-23T12:40:17.869-04:00"
+  },
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://open.epic.com/FHIR/StructureDefinition/observation-category",
+          "code": "genomics",
+          "display": "Diagnostic Implication"
+        }
+      ],
+      "text": "Diagnostic Implication"
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "84413-4",
+        "display": "Genotype display name"
+      }
+    ]
+  },
+  "subject": {
+    "reference": "Patient/76d2fa2d-66a6-4823-8dab-52cd70822844"
+  },
+  "effectiveDateTime": "2026-02-19T03:40:15Z",
+  "valueCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://glstring.org",
+        "code": "HLA-A*01:01+HLA-A*03:01^HLA-B*08:01+HLA-B*51:01^HLA-C*07:01+HLA-C*12:03^HLA-DRB1*03:01+HLA-DRB1*11:04^HLA-DQB1*02:01+HLA-DQB1*03:01^HLA-DRB4*01:03^HLA-DRB5*01:01:01"
+      }
+    ]
+  },
+  "ingestion_timestamp": "2026-03-24T05:52:59.840706",
+  "ingestion_date": "2026-03-24"
+}

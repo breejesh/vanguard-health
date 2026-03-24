@@ -1,0 +1,38 @@
+{
+  "resourceType": "MedicationRequest",
+  "id": "c320bfa2-35eb-4de3-a43c-ac7e637cc73d",
+  "meta": {
+    "versionId": "6",
+    "lastUpdated": "2026-02-22T02:20:05.956-05:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "stopped",
+  "intent": "order",
+  "medicationCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "code": "1804799",
+        "display": "Alteplase 100 MG Injection"
+      }
+    ],
+    "text": "Alteplase 100 MG Injection"
+  },
+  "subject": {
+    "reference": "Patient/b2eeab29-a67d-4941-8540-6372911cfc17"
+  },
+  "encounter": {
+    "reference": "Encounter/e9cb24ce-86e1-44f4-8f92-1e7897311f66"
+  },
+  "authoredOn": "2019-05-26T21:42:54+00:00",
+  "requester": {
+    "reference": "Practitioner/e34619ed-fc04-401f-a94c-1cf43395f4b3"
+  },
+  "ingestion_timestamp": "2026-03-24T05:53:04.964551",
+  "ingestion_date": "2026-03-24"
+}

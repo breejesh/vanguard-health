@@ -1,0 +1,23 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install minimal system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install only K8s orchestration dependencies (minimal)
+RUN pip install --upgrade pip && \
+    pip install kubernetes==29.0.0 pyyaml python-dotenv
+
+# Copy application code
+COPY src/ /app/src/
+COPY config/ /app/config/
+
+# Set environment variables
+ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1
+
+# Run orchestrator by default
+CMD ["python", "-m", "src.common.pipeline_orchestrator"]

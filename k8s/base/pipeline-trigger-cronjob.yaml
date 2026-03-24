@@ -1,0 +1,68 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: pipeline-trigger
+  namespace: vanguard-health
+  labels:
+    app: pipeline-trigger
+spec:
+  schedule: "*/2 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  suspend: false
+  
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 1800
+      backoffLimit: 1
+      activeDeadlineSeconds: 300
+      
+      template:
+        metadata:
+          labels:
+            app: pipeline-trigger
+            cron: "every-2min"
+        
+        spec:
+          serviceAccountName: vanguard-sa
+          restartPolicy: Never
+          
+          containers:
+          - name: trigger-controller
+            image: vanguard/ingestion:v1.0.0
+            imagePullPolicy: IfNotPresent
+            
+            command:
+            - python
+            - "-m"
+            - "src.common.trigger_controller"
+            
+            envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secrets
+            
+            env:
+            - name: LOG_LEVEL
+              value: "INFO"
+            - name: PYTHONUNBUFFERED
+              value: "1"
+            
+            volumeMounts:
+            - name: logs
+              mountPath: /app/logs
+            
+            resources:
+              requests:
+                memory: "512Mi"
+                cpu: "250m"
+              limits:
+                memory: "1Gi"
+                cpu: "500m"
+          
+          volumes:
+          - name: logs
+            emptyDir: {}

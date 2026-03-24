@@ -1,0 +1,61 @@
+# Python
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+.venv/
+env/
+.env/
+
+# Distribution / packaging
+bin/
+build/
+develop-eggs/
+dist/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Specific to Spark/PySpark
+spark-warehouse/  # Default Spark warehouse directory
+metastore_db/     # Default Derby metastore
+derby.log         # Default Derby log file
+logs/             # General log directory
+work/             # Spark's default work directory for standalone mode
+.spark/           # User-specific spark directory
+target/           # Common build output directory
+spark.egg-info/   # PySpark packaging info
+tmp/              # Temporary files
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*,cover
+
+# IDE-specific files (VS Code, PyCharm, etc.)
+.idea/
+.vscode/
+.history/
+*.swp
+*~
+.DS_Store
+
+# Jupyter Notebook files
+.ipynb_checkpoints

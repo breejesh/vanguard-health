@@ -7,9 +7,15 @@ RUN apt-get update && apt-get install -y \
     gcc \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy and install Python dependencies
-COPY docker/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Install essential Python dependencies for ingestion
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir \
+    pymongo==4.5.0 \
+    requests==2.31.0 \
+    python-dotenv==1.0.0 \
+    kafka-python==2.0.2 \
+    kubernetes==29.0.0 \
+    pyyaml==6.0
 
 # Copy application code
 COPY src/ ./src/

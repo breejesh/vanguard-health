@@ -1,0 +1,43 @@
+{
+  "resourceType": "MedicationRequest",
+  "id": "9e127d93-3153-49d4-be00-579cf312464e",
+  "meta": {
+    "versionId": "8",
+    "lastUpdated": "2026-02-24T02:24:11.664-05:00",
+    "tag": [
+      {
+        "system": "https://smarthealthit.org/tags",
+        "code": "synthea-5-2019"
+      }
+    ]
+  },
+  "status": "stopped",
+  "intent": "order",
+  "medicationCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "code": "313782",
+        "display": "Acetaminophen 325 MG Oral Tablet"
+      }
+    ],
+    "text": "Acetaminophen 325 MG Oral Tablet"
+  },
+  "subject": {
+    "reference": "Patient/c19264dc-4d8e-488f-b6df-31a896089080"
+  },
+  "encounter": {
+    "reference": "Encounter/949fe62a-e868-4358-81f0-1f8c741fc23e"
+  },
+  "authoredOn": "2018-06-15T14:01:06+00:00",
+  "requester": {
+    "reference": "Practitioner/8b85559d-27de-4d4b-bea7-5a715164cb60"
+  },
+  "reasonReference": [
+    {
+      "reference": "Condition/960835d1-b238-4b77-83a1-2c2e3c71bd22"
+    }
+  ],
+  "ingestion_timestamp": "2026-03-24T05:53:04.972498",
+  "ingestion_date": "2026-03-24"
+}
