@@ -24,7 +24,15 @@ class MetadataManager:
             logger.error(f"Could not connect to MongoDB at {mongo_uri}")
             raise
     
-    def record_job(self, job_name: str, status: str, records_processed: int, error_message: str = None):
+    def record_job(
+        self,
+        job_name: str,
+        status: str,
+        records_processed: int,
+        error_message: str = None,
+        pipeline_run_id: str = None,
+        details: Dict[str, Any] = None,
+    ):
         """Record job execution in MongoDB."""
         try:
             job_doc = {
@@ -33,8 +41,13 @@ class MetadataManager:
                 "records_processed": records_processed,
                 "started_at": datetime.now(),
                 "error_message": error_message,
-                "created_at": datetime.now()
+                "created_at": datetime.now(),
             }
+
+            if pipeline_run_id:
+                job_doc["pipeline_run_id"] = pipeline_run_id
+            if details:
+                job_doc["details"] = details
             
             result = self.db.jobs.insert_one(job_doc)
             logger.info(f"Recorded job {job_name} with status {status} (ID: {result.inserted_id})")
@@ -73,6 +86,40 @@ class MetadataManager:
             logger.info(f"Updated cursor {cursor_name} to {timestamp}")
         except Exception as e:
             logger.error(f"Error updating cursor: {e}")
+            raise
+
+    def get_pipeline_state(self, state_id: str) -> Optional[Dict[str, Any]]:
+        """Get an arbitrary pipeline state document by id."""
+        try:
+            return self.db.pipeline_state.find_one({"_id": state_id})
+        except Exception as e:
+            logger.error(f"Error reading pipeline state {state_id}: {e}")
+            return None
+
+    def set_pipeline_state(self, state_id: str, values: Dict[str, Any]):
+        """Upsert an arbitrary pipeline state document by id."""
+        try:
+            payload = {"last_update": datetime.now(), **values}
+            self.db.pipeline_state.update_one(
+                {"_id": state_id},
+                {"$set": payload},
+                upsert=True,
+            )
+        except Exception as e:
+            logger.error(f"Error writing pipeline state {state_id}: {e}")
+            raise
+
+    def upsert_pipeline_run(self, pipeline_run_id: str, values: Dict[str, Any]):
+        """Upsert a pipeline run summary record."""
+        try:
+            payload = {"last_update": datetime.now(), **values}
+            self.db.pipeline_runs.update_one(
+                {"_id": pipeline_run_id},
+                {"$set": payload, "$setOnInsert": {"created_at": datetime.now()}},
+                upsert=True,
+            )
+        except Exception as e:
+            logger.error(f"Error writing pipeline run {pipeline_run_id}: {e}")
             raise
     
     def record_data_quality(self, table_name: str, metrics: Dict[str, Any]):

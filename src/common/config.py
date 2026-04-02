@@ -18,9 +18,10 @@ class Config:
     GOLD_PATH = os.getenv("GOLD_PATH", "/data/gold")
     
     # Synthea FHIR API
-    SYNTHEA_API_URL = os.getenv("SYNTHEA_API_URL", "https://synthea-fhir-server.mitre.org/fhir")
+    SYNTHEA_API_URL = os.getenv("SYNTHEA_API_URL", "https://r4.smarthealthit.org")
     SYNTHEA_API_KEY = os.getenv("SYNTHEA_API_KEY", "local-key")
     SYNTHEA_FETCH_INTERVAL_HOURS = int(os.getenv("SYNTHEA_FETCH_INTERVAL_HOURS", "6"))
+    FETCH_LOOKBACK_DAYS = int(os.getenv("FETCH_LOOKBACK_DAYS", "180"))
     
     # MongoDB
     MONGODB_URI = os.getenv("MONGODB_URI", "mongodb://root:mongopass@localhost:27017/vanguard_metadata?authSource=admin")
@@ -33,7 +34,7 @@ class Config:
     REDIS_PASSWORD = os.getenv("REDIS_PASSWORD", "")
     
     # Firebase
-    FIREBASE_PROJECT_ID = os.getenv("FIREBASE_PROJECT_ID", "vanguard-health-dev")
+    FIREBASE_PROJECT_ID = os.getenv("FIREBASE_PROJECT_ID", "vanguard-health")
     FIREBASE_CREDENTIALS_PATH = os.getenv("FIREBASE_CREDENTIALS_PATH", "config/firebase-creds.json")
     
     # Spark

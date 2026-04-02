@@ -1,9 +1,26 @@
 ---
-# Persistent Volume Claim for data storage (uses Docker Desktop default hostpath)
+# Base host path on Docker Desktop Kubernetes node:
+# /run/desktop/mnt/host/f/My Data/Academic/GaTech/IHI/vanguard-health/data
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: dev-data-pv
+spec:
+  capacity:
+    storage: 50Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: hostpath
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /run/desktop/mnt/host/f/My Data/Academic/GaTech/IHI/vanguard-health/data/pipeline
+    type: DirectoryOrCreate
+---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: data-pvc
+  name: dev-data-pvc
 spec:
   accessModes:
     - ReadWriteOnce
@@ -11,12 +28,27 @@ spec:
   resources:
     requests:
       storage: 50Gi
+  volumeName: dev-data-pv
 ---
-# Persistent Volume Claim for MongoDB
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: dev-mongodb-pv
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: hostpath
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /run/desktop/mnt/host/f/My Data/Academic/GaTech/IHI/vanguard-health/data/mongodb
+    type: DirectoryOrCreate
+---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mongodb-pvc
+  name: dev-mongodb-pvc
 spec:
   accessModes:
     - ReadWriteOnce
@@ -24,12 +56,27 @@ spec:
   resources:
     requests:
       storage: 20Gi
+  volumeName: dev-mongodb-pv
 ---
-# Persistent Volume Claim for Redis
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: dev-redis-pv
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: hostpath
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /run/desktop/mnt/host/f/My Data/Academic/GaTech/IHI/vanguard-health/data/redis
+    type: DirectoryOrCreate
+---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: redis-pvc
+  name: dev-redis-pvc
 spec:
   accessModes:
     - ReadWriteOnce
@@ -37,12 +84,27 @@ spec:
   resources:
     requests:
       storage: 5Gi
+  volumeName: dev-redis-pv
 ---
-# Persistent Volume Claim for Zookeeper
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: dev-kafka-pv
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: hostpath
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /run/desktop/mnt/host/f/My Data/Academic/GaTech/IHI/vanguard-health/data/kafka
+    type: DirectoryOrCreate
+---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: zookeeper-pvc
+  name: dev-kafka-pvc
 spec:
   accessModes:
     - ReadWriteOnce
@@ -50,3 +112,6 @@ spec:
   resources:
     requests:
       storage: 10Gi
+  volumeName: dev-kafka-pv
+ 
+# Kafka and Zookeeper are not used in this deployment; PV/PVC entries removed.

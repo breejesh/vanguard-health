@@ -1,4 +1,5 @@
 import json
+import os
 import logging
 from typing import Dict, Any, Optional
 import firebase_admin
@@ -25,9 +26,16 @@ class FirebaseClient:
             return
         
         try:
-            # Load Firebase credentials
-            with open(config.FIREBASE_CREDENTIALS_PATH, 'r') as f:
-                creds_dict = json.load(f)
+            # Load Firebase credentials from the secret env var when available,
+            # otherwise fall back to the configured file path.
+            credentials_json = os.getenv("FIREBASE_CREDENTIALS_JSON") or os.getenv("FIREBASE_CREDENTIALS")
+            if credentials_json:
+                creds_dict = json.loads(credentials_json)
+                credentials_source = "environment"
+            else:
+                with open(config.FIREBASE_CREDENTIALS_PATH, 'r') as f:
+                    creds_dict = json.load(f)
+                credentials_source = config.FIREBASE_CREDENTIALS_PATH
             
             cred = credentials.Certificate(creds_dict)
             firebase_admin.initialize_app(cred, {
@@ -36,7 +44,7 @@ class FirebaseClient:
             
             self.db = db
             self._initialized = True
-            logger.info("Firebase client initialized")
+            logger.info(f"Firebase client initialized from {credentials_source}")
         except Exception as e:
             logger.error(f"Failed to initialize Firebase: {e}")
             raise

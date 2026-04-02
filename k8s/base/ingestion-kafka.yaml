@@ -1,101 +1,5 @@
----
-# Kafka Producer Job - creates fetch tasks
-apiVersion: batch/v1
-kind: CronJob
-metadata:
-  name: fhir-ingestion-producer
-  namespace: vanguard-health
-spec:
-  schedule: "0 */6 * * *"
-  concurrencyPolicy: Forbid
-  successfulJobsHistoryLimit: 3
-  failedJobsHistoryLimit: 3
-  jobTemplate:
-    spec:
-      activeDeadlineSeconds: 600
-      backoffLimit: 2
-      template:
-        metadata:
-          labels:
-            app: fhir-ingestion-producer
-        spec:
-          serviceAccountName: vanguard-sa
-          containers:
-          - name: producer
-            image: vanguard/ingestion:v1.0.0
-            imagePullPolicy: IfNotPresent
-            command: ["python", "-m", "src.ingestion.kafka_producer"]
-            envFrom:
-            - configMapRef:
-                name: app-config
-            - secretRef:
-                name: app-secrets
-            env:
-            - name: KAFKA_BOOTSTRAP_SERVERS
-              value: "dev-kafka-0.dev-kafka.vanguard-health.svc.cluster.local:9092"
-            resources:
-              requests:
-                memory: "256Mi"
-                cpu: "250m"
-              limits:
-                memory: "512Mi"
-                cpu: "500m"
-          restartPolicy: OnFailure
----
-# Kafka Consumer Workers Deployment - fetches data in parallel
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: fhir-fetch-workers
-  namespace: vanguard-health
-spec:
-  replicas: 4
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
-  selector:
-    matchLabels:
-      app: fhir-fetch-worker
-  template:
-    metadata:
-      labels:
-        app: fhir-fetch-worker
-    spec:
-      serviceAccountName: vanguard-sa
-      containers:
-      - name: worker
-        image: vanguard/ingestion:v1.0.0
-        imagePullPolicy: IfNotPresent
-        command: ["python", "-m", "src.ingestion.kafka_consumer"]
-        envFrom:
-        - configMapRef:
-            name: app-config
-        - secretRef:
-            name: app-secrets
-        env:
-        - name: KAFKA_BOOTSTRAP_SERVERS
-          value: "dev-kafka-0.dev-kafka.vanguard-health.svc.cluster.local:9092"
-        volumeMounts:
-        - name: data
-          mountPath: /mnt/data
-        - name: logs
-          mountPath: /app/logs
-        resources:
-          requests:
-            memory: "512Mi"
-            cpu: "500m"
-          limits:
-            memory: "1Gi"
-            cpu: "1"
-      volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: data-pvc
-      - name: logs
-        emptyDir: {}
----
+# The Kafka producer and consumer-based deployment were removed.
+# This file now only defines the Spark job trigger (retain for later scheduling).
 # Spark job trigger CronJob - runs every hour to process new Bronze data
 apiVersion: batch/v1
 kind: CronJob
@@ -120,7 +24,7 @@ spec:
           serviceAccountName: vanguard-sa
           containers:
           - name: spark-driver
-            image: vanguard/spark-jobs:v1.0.0
+            image: vanguard/spark-jobs:latest
             imagePullPolicy: IfNotPresent
             # Use Docker ENTRYPOINT (spark-submit from Dockerfile)
             envFrom:
@@ -143,7 +47,7 @@ spec:
           volumes:
           - name: data
             persistentVolumeClaim:
-              claimName: data-pvc
+              claimName: dev-data-pvc
           - name: logs
             emptyDir: {}
           restartPolicy: Never

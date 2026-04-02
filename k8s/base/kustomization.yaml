@@ -9,10 +9,9 @@ resources:
   - configmap.yaml
   - secret.yaml
   - pvc.yaml
-  - kafka-deployment.yaml
   - mongo-deployment.yaml
   - redis-deployment.yaml
-  - ingestion-kafka.yaml
+  - nodeport-services.yaml
   - pipeline-trigger-cronjob.yaml
 
 commonLabels:

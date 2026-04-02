@@ -43,6 +43,11 @@ class JobOrchestrator:
             logger.info(f"Job created successfully: {job_name}")
             return job_name
         except ApiException as e:
+            # If the Job already exists (409), log and return the existing name so
+            # the orchestrator can wait for it instead of failing outright.
+            if e.status == 409:
+                logger.warning(f"Job {job_name} already exists (409). Proceeding to wait for completion.")
+                return job_name
             logger.error(f"Failed to create job: {e}")
             raise
     
@@ -50,6 +55,7 @@ class JobOrchestrator:
         """Get job status (PENDING, RUNNING, SUCCEEDED, FAILED)."""
         try:
             job = self.batch_v1.read_namespaced_job(job_name, self.namespace)
+            conditions = {condition.type: condition.status for condition in (job.status.conditions or [])}
             
             status = {
                 "name": job_name,
@@ -61,11 +67,11 @@ class JobOrchestrator:
             }
             
             # Determine overall status
-            if job.status.failed and job.status.failed > 0:
-                status["state"] = "FAILED"
-            elif job.status.succeeded and job.status.succeeded > 0:
+            if conditions.get("Complete") == "True" or (job.status.succeeded and job.status.succeeded > 0):
                 status["state"] = "SUCCEEDED"
-            elif job.status.active and job.status.active > 0:
+            elif conditions.get("Failed") == "True":
+                status["state"] = "FAILED"
+            elif (job.status.active and job.status.active > 0) or (job.status.failed and job.status.failed > 0):
                 status["state"] = "RUNNING"
             else:
                 status["state"] = "PENDING"
@@ -138,46 +144,81 @@ class JobOrchestrator:
             if e.status != 404:
                 logger.warning(f"Error deleting job: {e}")
     
-    def orchestrate_pipeline(self, 
+    def orchestrate_pipeline(self,
+                            fetcher_job_manifest: dict,
                             bronze_job_manifest: dict,
-                            silver_job_manifest: dict, 
+                            silver_job_manifest: dict,
                             gold_job_manifest: dict,
+                            firebase_job_manifest: dict = None,
                             cleanup_on_complete: bool = True) -> bool:
-        """Run full pipeline: bronze -> silver -> gold."""
+        """Run full pipeline: fetcher -> bronze -> silver -> gold -> firebase.
+
+        All manifests are full Kubernetes Job manifests. Any manifest may be None
+        to skip that stage.
+        """
         logger.info("=" * 60)
         logger.info("Starting pipeline orchestration")
         logger.info("=" * 60)
         
         try:
-            # Stage 1: Bronze ingestion
-            bronze_name = bronze_job_manifest["metadata"]["name"]
-            logger.info(f"\n[STAGE 1/3] Triggering Bronze ingestion: {bronze_name}")
-            self.create_job(bronze_job_manifest)
-            
-            if not self.wait_for_job(bronze_name, timeout_seconds=3600):
-                logger.error("Bronze job failed, aborting pipeline")
-                return False
-            logger.info(f"✓ Bronze job completed successfully")
-            
-            # Stage 2: Bronze to Silver transformation
-            silver_name = silver_job_manifest["metadata"]["name"]
-            logger.info(f"\n[STAGE 2/3] Triggering Bronze-to-Silver transformation: {silver_name}")
-            self.create_job(silver_job_manifest)
-            
-            if not self.wait_for_job(silver_name, timeout_seconds=7200):
-                logger.error("Silver job failed, aborting pipeline")
-                return False
-            logger.info(f"✓ Silver job completed successfully")
-            
-            # Stage 3: Silver to Gold transformation
-            gold_name = gold_job_manifest["metadata"]["name"]
-            logger.info(f"\n[STAGE 3/3] Triggering Silver-to-Gold transformation: {gold_name}")
-            self.create_job(gold_job_manifest)
-            
-            if not self.wait_for_job(gold_name, timeout_seconds=7200):
-                logger.error("Gold job failed")
-                # Don't abort - gold is final stage
-            logger.info(f"✓ Gold job completed successfully")
+            # Stage 1: Fetcher (optional)
+            if fetcher_job_manifest:
+                fetcher_name = fetcher_job_manifest["metadata"]["name"]
+                logger.info(f"\n[STAGE 1/5] Triggering Fetcher job: {fetcher_name}")
+                self.create_job(fetcher_job_manifest)
+                if not self.wait_for_job(fetcher_name, timeout_seconds=3600):
+                    logger.error("Fetcher job failed, aborting pipeline")
+                    return False
+                logger.info("✓ Fetcher job completed successfully")
+            else:
+                logger.info("\n[STAGE 1/5] Skipping Fetcher (manifest not provided)")
+
+            # Stage 2: Bronze ingestion (optional)
+            if bronze_job_manifest:
+                bronze_name = bronze_job_manifest["metadata"]["name"]
+                logger.info(f"\n[STAGE 2/5] Triggering Bronze ingestion: {bronze_name}")
+                self.create_job(bronze_job_manifest)
+                if not self.wait_for_job(bronze_name, timeout_seconds=3600):
+                    logger.error("Bronze job failed, aborting pipeline")
+                    return False
+                logger.info(f"✓ Bronze job completed successfully")
+            else:
+                logger.info("\n[STAGE 2/5] Skipping Bronze ingestion (manifest not provided)")
+
+            # Stage 3: Bronze to Silver transformation
+            if silver_job_manifest:
+                silver_name = silver_job_manifest["metadata"]["name"]
+                logger.info(f"\n[STAGE 3/5] Triggering Bronze-to-Silver transformation: {silver_name}")
+                self.create_job(silver_job_manifest)
+                if not self.wait_for_job(silver_name, timeout_seconds=7200):
+                    logger.error("Silver job failed, aborting pipeline")
+                    return False
+                logger.info(f"✓ Silver job completed successfully")
+            else:
+                logger.info("\n[STAGE 3/5] Skipping Silver transformation (manifest not provided)")
+
+            # Stage 4: Silver to Gold transformation
+            if gold_job_manifest:
+                gold_name = gold_job_manifest["metadata"]["name"]
+                logger.info(f"\n[STAGE 4/5] Triggering Silver-to-Gold transformation: {gold_name}")
+                self.create_job(gold_job_manifest)
+                if not self.wait_for_job(gold_name, timeout_seconds=7200):
+                    logger.error("Gold job failed")
+                logger.info(f"✓ Gold job completed successfully")
+            else:
+                logger.info("\n[STAGE 4/5] Skipping Gold transformation (manifest not provided)")
+
+            # Stage 5: Firebase push (optional)
+            if firebase_job_manifest:
+                fb_name = firebase_job_manifest["metadata"]["name"]
+                logger.info(f"\n[STAGE 5/5] Triggering Firebase push job: {fb_name}")
+                self.create_job(firebase_job_manifest)
+                if not self.wait_for_job(fb_name, timeout_seconds=1800):
+                    logger.error("Firebase push job failed")
+                    # Do not abort pipeline; log and continue
+                logger.info("✓ Firebase push completed (or finished with errors logged)")
+            else:
+                logger.info("\n[STAGE 5/5] Skipping Firebase push (manifest not provided)")
             
             logger.info("\n" + "=" * 60)
             logger.info("Pipeline orchestration completed successfully!")

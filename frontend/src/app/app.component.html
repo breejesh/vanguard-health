@@ -1,0 +1,112 @@
+﻿<main class="shell">
+  <aside class="sidebar panel">
+    <h1 class="brand">Vanguard <span>Health</span></h1>
+
+    <section class="control-group">
+      <label class="control-label">Condition Type</label>
+      <select [(ngModel)]="selectedCondition" (change)="onConditionChange()" [disabled]="loading || conditionOptions.length === 0">
+        <option *ngFor="let condition of conditionOptions" [value]="condition.code">{{ condition.display }}</option>
+      </select>
+    </section>
+
+    <section class="control-group">
+      <label class="control-label">Time Window</label>
+      <div class="window-controls">
+        <button
+          class="window-chip"
+          *ngFor="let option of timeWindowOptions"
+          [class.active]="selectedWindowDays === option.days"
+          (click)="setTimeWindow(option.days)"
+          [disabled]="loading"
+          type="button"
+        >
+          {{ option.label }}
+        </button>
+      </div>
+      <div class="custom-window">
+        <label for="days-window">Custom</label>
+        <input
+          id="days-window"
+          type="number"
+          min="1"
+          max="180"
+          [(ngModel)]="customWindowDays"
+          (change)="normalizeCustomWindow()"
+          [disabled]="loading"
+        />
+        <span>days</span>
+      </div>
+    </section>
+
+    <footer class="sidebar-footer">
+      <p class="sidebar-footer-title">Database Overview</p>
+      <div class="sidebar-total-grid">
+        <article class="mini-stat">
+          <p class="mini-label">Total Conditions</p>
+          <p class="mini-value">{{ totalStats.totalConditions }}</p>
+        </article>
+        <article class="mini-stat">
+          <p class="mini-label">Total Cases</p>
+          <p class="mini-value">{{ totalStats.totalPatients | number }}</p>
+        </article>      
+        <article class="mini-stat">
+          <p class="mini-label">Total Hotspots</p>
+          <p class="mini-value">{{ totalStats.totalCells }}</p>
+        </article>
+      </div>
+    </footer>
+  </aside>
+
+  <section class="content panel">
+    <header class="status-bar">
+      <div class="status-left">
+        <span class="dot"></span>
+        <span>Last Updated: {{ lastUpdatedLabel }}</span>
+      </div>
+      <span class="window-pill">Past {{ selectedWindowDays }} day<span *ngIf="selectedWindowDays > 1">s</span></span>
+    </header>
+
+    <div class="loading-rail" role="status" aria-live="polite" [attr.aria-label]="loading ? 'Loading data' : 'Data loaded'">
+      <span class="loading-fill" [class.active]="loading"></span>
+    </div>
+
+    <p class="viewing" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+    <div class="stats-grid">
+      <article class="stat-card">
+        <p class="stat-label">Cases</p>
+        <p class="stat-value">{{ filteredStats.totalCases | number }}</p>
+      </article>
+      <article class="stat-card">
+        <p class="stat-label">Active Hotspot Cells</p>
+        <p class="stat-value">{{ filteredStats.cellCount }}</p>
+      </article>
+      <article class="stat-card">
+        <p class="stat-label">Active Days</p>
+        <p class="stat-value">{{ filteredStats.activeDays }}</p>
+      </article>
+    </div>
+
+    <div class="map-wrap">
+      <div id="health-map" class="map"></div>
+
+      <section class="map-legend" aria-label="Risk color legend">
+        <p class="legend-title">Risk Legend</p>
+        <div class="legend-items">
+          <span class="legend-item">
+            <span class="legend-swatch swatch-red"></span>
+            <span>High</span>
+          </span>
+          <span class="legend-item">
+            <span class="legend-swatch swatch-orange"></span>
+            <span>Medium</span>
+          </span>
+          <span class="legend-item">
+            <span class="legend-swatch swatch-yellow"></span>
+            <span>Low</span>
+          </span>
+        </div>
+      </section>
+    </div>
+  </section>
+</main>

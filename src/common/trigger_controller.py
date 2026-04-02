@@ -1,7 +1,7 @@
 """
 Pipeline Trigger Controller - runs as CronJob every 2 minutes
 Checks if main pipeline should run based on:
-- Last successful run time (must be > 1 hour ago)
+- Last successful run time (must be >= 10 minutes ago)
 - No jobs currently running
 """
 import sys
@@ -29,7 +29,7 @@ class PipelineTriggerController:
     """Controls when to trigger the main data pipeline."""
     
     # Configuration
-    MIN_INTERVAL_HOURS = 1  # Minimum time between runs
+    MIN_INTERVAL_MINUTES = 10  # Minimum time between orchestrator runs
     
     def __init__(self):
         """Initialize MongoDB and K8s clients."""
@@ -119,7 +119,7 @@ class PipelineTriggerController:
     
     def should_trigger_pipeline(self) -> tuple[bool, str]:
         """Determine if pipeline should be triggered based on:
-        - Last run time (must be > 1 hour ago)
+        - Last run time (must be >= 10 minutes ago)
         - No jobs currently running
         
         Returns (should_trigger, reason)
@@ -143,21 +143,21 @@ class PipelineTriggerController:
         if last_run.tzinfo is None:
             last_run = last_run.replace(tzinfo=timezone.utc)
         
-        elapsed_hours = (now - last_run).total_seconds() / 3600
-        
-        if elapsed_hours >= self.MIN_INTERVAL_HOURS:
-            return True, f"Last run was {elapsed_hours:.1f} hours ago (≥ {self.MIN_INTERVAL_HOURS}h) - triggering"
+        elapsed_minutes = (now - last_run).total_seconds() / 60
+
+        if elapsed_minutes >= self.MIN_INTERVAL_MINUTES:
+            return True, f"Last run was {elapsed_minutes:.1f} minutes ago (>= {self.MIN_INTERVAL_MINUTES}m) - triggering"
         else:
-            return False, f"Last run was {elapsed_hours:.1f} hours ago (< {self.MIN_INTERVAL_HOURS}h) - skipping"
+            return False, f"Last run was {elapsed_minutes:.1f} minutes ago (< {self.MIN_INTERVAL_MINUTES}m) - skipping"
     
     def trigger_pipeline(self) -> bool:
         """Trigger the main pipeline orchestration job."""
         try:
-            logger.info("\nTriggering main pipeline orchestration job...")
-            
+            logger.info("\nTriggering main pipeline orchestrator job")
+            orchestrator_image = os.getenv("PIPELINE_ORCHESTRATOR_IMAGE", "vanguard/pipeline-orchestrator:latest")
+
             batch_v1 = client.BatchV1Api()
-            
-            # Create main orchestrator job
+
             orchestrator_job = {
                 "apiVersion": "batch/v1",
                 "kind": "Job",
@@ -179,7 +179,7 @@ class PipelineTriggerController:
                             "containers": [
                                 {
                                     "name": "orchestrator",
-                                    "image": "vanguard/pipeline-orchestrator:latest",
+                                    "image": orchestrator_image,
                                     "imagePullPolicy": "IfNotPresent",
                                     "env": [
                                         {
@@ -201,10 +201,10 @@ class PipelineTriggerController:
                                     }
                                 }
                             ],
-                            "volumes": [
+                                "volumes": [
                                 {
                                     "name": "data",
-                                    "persistentVolumeClaim": {"claimName": "data-pvc"}
+                                    "persistentVolumeClaim": {"claimName": "dev-data-pvc"}
                                 },
                                 {"name": "logs", "emptyDir": {}}
                             ]
@@ -212,12 +212,13 @@ class PipelineTriggerController:
                     }
                 }
             }
-            
+
             response = batch_v1.create_namespaced_job(
                 namespace=self.namespace,
                 body=orchestrator_job
             )
-            
+
+            logger.info(f"Using orchestrator image: {orchestrator_image}")
             logger.info(f"Pipeline orchestration job submitted: {response.metadata.name}")
             self.set_last_run_time(datetime.now(timezone.utc))
             return True

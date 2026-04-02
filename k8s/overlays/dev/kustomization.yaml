@@ -6,16 +6,10 @@ namespace: vanguard-health
 resources:
   - ../../base
 
-namePrefix: dev-
-
-commonLabels:
-  environment: dev
-  tier: local
-
 patches:
   - target:
       kind: Deployment
-      name: mongodb
+      name: dev-mongodb
     patch: |-
       - op: replace
         path: /spec/template/spec/containers/0/resources/requests/memory
@@ -33,62 +27,3 @@ patches:
       - op: replace
         path: /spec/template/spec/containers/0/resources/limits/memory
         value: "2Gi"
-  # Expose services as NodePort for local debugging
-  - target:
-      kind: Service
-      name: mongodb
-    patch: |-
-      - op: replace
-        path: /spec/selector
-        value:
-          component: mongodb
-      - op: remove
-        path: /spec/clusterIP
-      - op: replace
-        path: /spec/type
-        value: "NodePort"
-      - op: add
-        path: /spec/ports/0/nodePort
-        value: 30017
-  - target:
-      kind: Service
-      name: kafka
-    patch: |-
-      - op: replace
-        path: /spec/selector
-        value:
-          component: kafka
-      - op: remove
-        path: /spec/clusterIP
-      - op: replace
-        path: /spec/type
-        value: "NodePort"
-      - op: add
-        path: /spec/ports/0/nodePort
-        value: 30092
-  - target:
-      kind: Service
-      name: redis
-    patch: |-
-      - op: replace
-        path: /spec/selector
-        value:
-          component: redis
-      - op: remove
-        path: /spec/clusterIP
-      - op: replace
-        path: /spec/type
-        value: "NodePort"
-      - op: add
-        path: /spec/ports/0/nodePort
-        value: 30379
-  - target:
-      kind: StatefulSet
-      name: kafka
-    patch: |-
-      - op: replace
-        path: /spec/template/spec/containers/0/env/1/value
-        value: "dev-zookeeper.vanguard-health.svc.cluster.local:2181"
-      - op: replace
-        path: /spec/template/spec/containers/0/env/2/value
-        value: "PLAINTEXT://dev-kafka-0.dev-kafka.vanguard-health.svc.cluster.local:9092"

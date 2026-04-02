@@ -22,7 +22,7 @@ spec:
       
       containers:
       - name: orchestrator
-        image: vanguard/pipeline-orchestrator:v1.0.0
+        image: vanguard/pipeline-orchestrator:latest
         imagePullPolicy: IfNotPresent
         
         command:
@@ -61,6 +61,6 @@ spec:
       volumes:
       - name: data
         persistentVolumeClaim:
-          claimName: data-pvc
+          claimName: dev-data-pvc
       - name: logs
         emptyDir: {}

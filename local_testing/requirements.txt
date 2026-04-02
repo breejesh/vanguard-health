@@ -9,4 +9,7 @@ python-dotenv>=0.21.0
 pyspark==3.2.4
 
 # Optional: for advanced data processing
+numpy<2
 pyarrow>=12.0.0  # For better Parquet support
+
+pymongo>=4.5.0  # For MongoDB interactions

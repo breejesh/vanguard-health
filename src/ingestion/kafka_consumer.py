@@ -14,7 +14,7 @@ from kafka.errors import KafkaError, NoBrokersAvailable
 from src.common.config import get_config
 from src.common.logger import setup_logger
 from src.ingestion.fhir_fetcher import FHIRFetcher
-from src.ingestion.hudi_writer import HudiWriter
+from src.ingestion.bronze_writer import BronzeWriter
 from src.ingestion.metadata_manager import MetadataManager
 
 logger = setup_logger(__name__)
@@ -29,8 +29,9 @@ class FetchWorker:
         self.consumer = self._connect_kafka_with_retry(kafka_servers)
         
         self.fetcher = FHIRFetcher(config.SYNTHEA_API_URL, os.getenv("SYNTHEA_API_KEY"))
-        self.writer = HudiWriter(config.BRONZE_PATH)
+        self.writer = BronzeWriter(config.BRONZE_PATH)
         self.metadata_manager = MetadataManager(config.MONGODB_URI, config.MONGODB_DB)
+        self.pipeline_run_id = os.getenv("PIPELINE_RUN_ID")
         
         # Get worker ID from hostname
         self.worker_id = os.getenv("HOSTNAME", "unknown")
@@ -82,12 +83,29 @@ class FetchWorker:
             if resources:
                 # Write to Bronze
                 self.writer.write_to_bronze(resources)
+
+                self.metadata_manager.set_pipeline_state(
+                    "bronze_latest_run",
+                    {
+                        "run_ts": self.writer.last_run_ts,
+                        "run_path": self.writer.last_run_path,
+                        "pipeline_run_id": self.pipeline_run_id,
+                        "records_processed": len(resources),
+                        "updated_at": datetime.utcnow(),
+                    },
+                )
                 
                 # Record completion
                 self.metadata_manager.record_job(
                     f"fetch_worker_{resource_type}",
                     "completed",
-                    len(resources)
+                    len(resources),
+                    pipeline_run_id=self.pipeline_run_id,
+                    details={
+                        "bronze_ts": self.writer.last_run_ts,
+                        "bronze_path": self.writer.last_run_path,
+                        "task_id": task_id,
+                    },
                 )
                 
                 logger.info(f"[{self.worker_id}] Completed {resource_type}: {len(resources)} records")
@@ -102,7 +120,8 @@ class FetchWorker:
                 f"fetch_worker_{resource_type}",
                 "failed",
                 0,
-                str(e)
+                str(e),
+                pipeline_run_id=self.pipeline_run_id,
             )
             return False
     

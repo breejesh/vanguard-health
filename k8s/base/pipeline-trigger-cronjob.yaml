@@ -7,6 +7,7 @@ metadata:
   labels:
     app: pipeline-trigger
 spec:
+  # Run every 2 minutes
   schedule: "*/2 * * * *"
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3

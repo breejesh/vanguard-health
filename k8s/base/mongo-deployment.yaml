@@ -2,18 +2,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mongodb
+  name: dev-mongodb
   namespace: vanguard-health
   labels:
-    app: mongodb
+    app: vanguard-health
+    component: mongodb
 spec:
   replicas: 1
   selector:
     matchLabels:
+      app: vanguard-health
       component: mongodb
   template:
     metadata:
       labels:
+        app: vanguard-health
         component: mongodb
     spec:
       containers:
@@ -46,17 +49,19 @@ spec:
       volumes:
       - name: data
         persistentVolumeClaim:
-          claimName: mongodb-pvc
+          claimName: dev-mongodb-pvc
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: mongodb
+  name: dev-mongodb
   namespace: vanguard-health
   labels:
-    app: mongodb
+    app: vanguard-health
+    component: mongodb
 spec:
   selector:
+    app: vanguard-health
     component: mongodb
   ports:
   - port: 27017

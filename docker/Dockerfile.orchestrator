@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y \
 
 # Install only K8s orchestration dependencies (minimal)
 RUN pip install --upgrade pip && \
-    pip install kubernetes==29.0.0 pyyaml python-dotenv
+    pip install kubernetes==29.0.0 pyyaml python-dotenv pymongo==4.5.0
 
 # Copy application code
 COPY src/ /app/src/
