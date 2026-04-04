@@ -159,6 +159,13 @@ class JobOrchestrator:
         logger.info("=" * 60)
         logger.info("Starting pipeline orchestration")
         logger.info("=" * 60)
+
+        # Track names only for stages that were actually created.
+        fetcher_name = None
+        bronze_name = None
+        silver_name = None
+        gold_name = None
+        fb_name = None
         
         try:
             # Stage 1: Fetcher (optional)
@@ -227,9 +234,9 @@ class JobOrchestrator:
             # Cleanup
             if cleanup_on_complete:
                 logger.info("\nCleaning up job resources...")
-                self.cleanup_job(bronze_name)
-                self.cleanup_job(silver_name)
-                self.cleanup_job(gold_name)
+                for job_name in (fetcher_name, bronze_name, silver_name, gold_name, fb_name):
+                    if job_name:
+                        self.cleanup_job(job_name)
             
             return True
         
