@@ -313,11 +313,6 @@ select {
 	background: #ffd35c;
 }
 
-:host ::ng-deep .state-label-marker {
-	background: transparent;
-	border: none;
-}
-
 :host ::ng-deep .city-label-marker {
 	background: transparent;
 	border: none;
@@ -335,21 +330,6 @@ select {
 	background: rgba(206, 231, 247, 0.9);
 	border: 1px solid rgba(72, 125, 163, 0.55);
 	box-shadow: 0 2px 7px rgba(0, 0, 0, 0.16);
-	white-space: nowrap;
-}
-
-:host ::ng-deep .state-label-chip {
-	display: inline-block;
-	padding: 3px 8px;
-	border-radius: 999px;
-	font-size: 0.66rem;
-	font-weight: 700;
-	letter-spacing: 0.06em;
-	text-transform: uppercase;
-	color: #11394f;
-	background: rgba(214, 248, 255, 0.86);
-	border: 1px solid rgba(102, 176, 205, 0.62);
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
 	white-space: nowrap;
 }
 

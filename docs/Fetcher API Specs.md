@@ -1,7 +1,11 @@
 # Fetcher API Specs
 
 ## Purpose
-This document lists the outbound HTTP API calls used by the backend fetch/push flow.
+This document lists the outbound HTTP API calls used by the backend ingestion flow.
+
+Downstream context:
+- Fetcher output lands in Bronze, then flows to Silver and Gold.
+- Gold Parquet files are consumed in-browser by DuckDB-WASM.
 
 ## Base endpoint
 - Pull source (FHIR R4): https://r4.smarthealthit.org
@@ -96,3 +100,8 @@ Example:
 - HTTP errors propagate through `response.raise_for_status()` in fetch paths.
 - Pagination continues only while a valid `next` link is present.
 - Fetch cursor advances only after Bronze write succeeds, reducing risk of data loss on partial failures.
+
+## Non-goals of this document
+
+This doc is API-call focused. It does not define analytics table schemas.
+For frontend-consumed Parquet schemas and DuckDB query contract, see DuckDB Parquet Data Schema.md.

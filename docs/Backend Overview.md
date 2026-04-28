@@ -2,54 +2,73 @@
 
 ## What it does
 
-Our backend is a staged healthcare data pipeline:
-1. Pull FHIR data incrementally from https://r4.smarthealthit.org.
-2. Store raw data in Bronze.
-3. Normalize and dedupe into Silver.
-4. Aggregate analytics outputs in Gold.
-5. Publish Gold parquet + metadata for static hosting (CDN/local assets) consumed directly by the frontend.
+Vanguard Health uses a staged analytics pipeline and serves query-ready Parquet assets to the frontend.
+The browser runs DuckDB-WASM to execute interactive filters directly on those files.
 
-## Data flow (simple view)
+End-to-end stages:
+1. Fetch incremental FHIR R4 data from https://r4.smarthealthit.org.
+2. Store raw snapshots in Bronze.
+3. Normalize and dedupe into Silver.
+4. Aggregate Gold outputs for map and timeline analytics.
+5. Serve Gold Parquet files as static assets for in-browser DuckDB queries.
+
+## Data flow
 
 1. Fetcher -> Bronze
-- Reads last cursor from MongoDB.
-- Calls https://r4.smarthealthit.org FHIR endpoints with `_lastUpdated=ge<cursor>` and pagination.
-- Writes timestamped parquet snapshots per resource type.
+- Reads incremental cursor/state from MongoDB.
+- Calls FHIR endpoints with _lastUpdated cursor and pagination.
+- Writes timestamped Parquet snapshots by resource type.
 
 2. Bronze -> Silver
-- Parses raw FHIR JSON into typed columns.
-- Dedupes by entity keys (patient_id, encounter_id, condition_id, etc.).
-- Writes timestamped silver snapshots.
+- Parses FHIR JSON into typed tabular records.
+- Applies normalization and deduplication keys.
+- Writes timestamped Silver Parquet snapshots.
 
 3. Silver -> Gold
-- Reads Silver (usually by run timestamp).
-- Aggregates condition counts by date and H3 geospatial cell.
-- Writes partitioned JSONL plus per-condition parquet files optimized for fast map/time queries.
+- Builds analytics-friendly aggregates by condition, date, H3 cell, age group, and gender.
+- Produces per-condition Parquet files and supporting metadata Parquet files.
 
-4. Gold -> Static hosting (CDN/local)
-- Serves parquet + metadata files directly to the browser where DuckDB-WASM handles interactive filtering.
+4. Gold -> Frontend runtime
+- Gold files are hosted from local assets or CDN.
+- Frontend downloads Parquet files and runs SQL with DuckDB-WASM.
+- No Firestore reads are required for the interactive analytics path.
+
+## Gold artifacts consumed by frontend
+
+The frontend expects these files under the configured Gold base URL:
+- _conditions.parquet
+- _h3_reference.parquet
+- {condition}.parquet (per condition code)
+
+See DuckDB Parquet schema details in DuckDB Parquet Data Schema.md.
+
+## Runtime query model
+
+- Metadata load:
+	- Reads _conditions.parquet and _h3_reference.parquet.
+- Aggregate hotspot query:
+	- Groups by H3 over a date window and demographic filters.
+- Daily series query:
+	- Groups by date_key and H3 for animation/timeline playback.
+- Latest data date query:
+	- MAX(date_key) or MAX(date) from the selected condition file.
+
+All query execution is performed in-browser by DuckDB-WASM.
 
 ## Why this scales
 
-- Incremental pull: only new/updated records are fetched each run.
-- Snapshot isolation: timestamped Bronze/Silver outputs make retries safer and debugging easier.
-- Stage separation: fetch, transform, aggregate, and publish can be tuned independently.
-- Query-ready Gold: heavy computation is done ahead of time, so frontend reads are fast.
-- Metadata tracking: MongoDB stores cursor, run state, and job history for reliability.
+- Incremental ingestion limits upstream API load.
+- Stage isolation keeps fetch/transform/aggregate concerns independent.
+- Pre-aggregated Gold files reduce frontend compute and network chatter.
+- Columnar Parquet plus DuckDB vectorized execution keeps interactive filters fast.
+- Static hosting simplifies deployment and avoids operational DB query infrastructure for the UI path.
 
-## Implementation note
+## Validation path used in this project
 
-For the scope of this project, we moved from Hudi-based storage to basic Parquet + Spark processing.
-This reduced operational complexity and avoided Hudi-specific dependency/catalog issues,
-while keeping the pipeline simpler to run and debug.
+For end-to-end validation we used:
+- local_testing/push_synthea_covid19_r4.py
 
-## Validation data push we used
+It pushes COVID-focused Synthea data to:
+- https://r4.smarthealthit.org
 
-To validate ingestion end-to-end, we used a custom script:
-- `local_testing/push_synthea_covid19_r4.py`
-
-It pushes COVID-focused Synthea records 
-from: https://synthetichealth.github.io/synthea-sample-data/downloads/10k_synthea_covid19_csv.zip
-to: https://r4.smarthealthit.org
-
-This lets us confirm that data published to the FHIR source is then pulled by our fetcher and appears downstream in Bronze/Silver/Gold.
+This validates that published FHIR resources flow through Bronze, Silver, and Gold, then appear in frontend DuckDB queries.

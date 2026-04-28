@@ -1,22 +1,19 @@
 import { Injectable } from '@angular/core';
 import * as duckdb from '@duckdb/duckdb-wasm';
 import { environment } from '../../environments/environment';
+import { ConditionParquetSchema } from '../models/parquet/condition-parquet-schema.model';
+import { LocalDuckDbBundle } from '../models/parquet/local-duckdb-bundle.model';
+import { ParquetAggregatedRow } from '../models/parquet/parquet-aggregated-row.model';
+import { ParquetConditionOption } from '../models/parquet/parquet-condition-option.model';
+import { ParquetDailyRow } from '../models/parquet/parquet-daily-row.model';
+import { ParquetMetadataSnapshot } from '../models/parquet/parquet-metadata-snapshot.model';
+import { ParquetQueryFilters } from '../models/parquet/parquet-query-filters.model';
 
-interface ConditionParquetSchema {
-  alias: string;
-  dateColumn: string;
-  h3Column: string;
-  caseColumn: string;
-  ageColumn?: string;
-  genderColumn?: string;
-  conditionColumn?: string;
-}
-
-interface LocalDuckDbBundle {
-  mainModule: string;
-  mainWorker: string;
-  pthreadWorker: string | null;
-}
+export type { ParquetAggregatedRow } from '../models/parquet/parquet-aggregated-row.model';
+export type { ParquetConditionOption } from '../models/parquet/parquet-condition-option.model';
+export type { ParquetDailyRow } from '../models/parquet/parquet-daily-row.model';
+export type { ParquetMetadataSnapshot } from '../models/parquet/parquet-metadata-snapshot.model';
+export type { ParquetQueryFilters } from '../models/parquet/parquet-query-filters.model';
 
 type DuckDbBundleSource = 'local' | 'cdn';
 type DuckDbBundleCandidates = Record<
@@ -27,45 +24,6 @@ type DuckDbBundleCandidates = Record<
     pthreadWorker?: string | null;
   }
 >;
-
-export interface ParquetConditionOption {
-  code: string;
-  display: string;
-  patientCount: number;
-}
-
-export interface ParquetMetadataSnapshot {
-  lastUpdatedIso: string;
-  totalConditions: number;
-  totalCases: number;
-  totalPatients: number;
-  totalCells: number;
-  ageGroups: string[];
-  genders: string[];
-  conditions: ParquetConditionOption[];
-  h3Reference: Record<string, { latitude: number; longitude: number }>;
-}
-
-export interface ParquetQueryFilters {
-  conditionCode: string;
-  startDate: string;
-  endDate: string;
-  ageGroups: string[];
-  genders: string[];
-}
-
-export interface ParquetAggregatedRow {
-  h3: string;
-  caseCount: number;
-  latestDate: string;
-  daysWithCases: number;
-}
-
-export interface ParquetDailyRow {
-  dateKey: string;
-  h3: string;
-  caseCount: number;
-}
 
 @Injectable({
   providedIn: 'root',
