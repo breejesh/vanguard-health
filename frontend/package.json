@@ -4,9 +4,12 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "serve": "ng serve",
     "build": "ng build",
+    "build-prod": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "static": "http-server dist/frontend -p 8080",
     "ship": "ng build --configuration production && firebase deploy --only hosting"
   },
   "private": true,
@@ -20,8 +23,8 @@
     "@angular/platform-browser": "^14.0.0",
     "@angular/platform-browser-dynamic": "^14.0.0",
     "@angular/router": "^14.0.0",
+    "@duckdb/duckdb-wasm": "^1.33.1-dev45.0",
     "@types/leaflet": "^1.9.21",
-    "firebase": "^9.23.0",
     "h3-js": "^4.1.0",
     "leaflet": "^1.9.4",
     "rxjs": "~7.5.0",

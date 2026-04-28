@@ -4,17 +4,34 @@
 
 export const environment = {
   production: false,
-  firebase: {
-    // Frontend must use Firebase Web SDK config (apiKey/appId/etc),
-    // never the Admin SDK service-account key.
-    apiKey: '',
-    authDomain: 'vanguard-health.firebaseapp.com',
-    projectId: 'vanguard-health',
-    // Optional for Firestore-only UI usage.
-    storageBucket: '',
-    messagingSenderId: '',
-    appId: ''
-  }
+  duckdbAssetCacheKey: '20260428',
+  parquetSource: 'local', // 'local' or 'firebase-cdn'
+  parquetSources: {
+    local: {
+      baseUrl: '/assets/gold',
+    },
+    'firebase-cdn': {
+      baseUrl: 'https://vanguard-health.web.app/gold',
+    },
+  },
+  parquetFiles: {
+    conditionsParquet: '_conditions.parquet',
+    h3ReferenceParquet: '_h3_reference.parquet',
+    conditionParquetTemplate: '{condition}.parquet',
+  },
+  duckdbBundles: {
+    mvp: {
+      mainModule: 'assets/duckdb/duckdb-mvp.wasm?v=20260428',
+      mainWorker: 'assets/duckdb/duckdb-browser-mvp.worker.js?v=20260428',
+      pthreadWorker: null,
+    },
+    eh: {
+      mainModule: 'assets/duckdb/duckdb-eh.wasm?v=20260428',
+      mainWorker: 'assets/duckdb/duckdb-browser-eh.worker.js?v=20260428',
+      pthreadWorker: null,
+    },
+  },
+  duckdbBundlePriority: ['local'],
 };
 
 /*

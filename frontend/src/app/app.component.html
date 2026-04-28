@@ -1,4 +1,6 @@
-﻿<main class="shell">
+﻿<main class="shell" [class.animating]="isAnimating">
+  <div class="animation-overlay" *ngIf="isAnimating"></div>
+  
   <aside class="sidebar panel">
     <h1 class="brand">Vanguard <span>Health</span></h1>
 
@@ -36,6 +38,52 @@
         />
         <span>days</span>
       </div>
+    </section>
+
+    <section class="control-group">
+      <label class="control-label">Age Group</label>
+      <div class="filter-buttons">
+        <button
+          *ngFor="let option of ageGroupOptions"
+          class="filter-chip"
+          [class.active]="isAgeGroupSelected(option.value)"
+          (click)="toggleAgeGroup(option.value)"
+          [disabled]="loading"
+          type="button"
+        >
+          {{ option.label }}
+        </button>
+      </div>
+    </section>
+
+    <section class="control-group">
+      <label class="control-label">Gender</label>
+      <div class="filter-buttons">
+        <button
+          *ngFor="let option of genderOptions"
+          class="filter-chip"
+          [class.active]="isGenderSelected(option.value)"
+          (click)="toggleGender(option.value)"
+          [disabled]="loading"
+          type="button"
+        >
+          {{ option.label }}
+        </button>
+      </div>
+    </section>
+
+    <section class="control-group animate-section">
+      <button
+        class="animate-btn"
+        [class.playing]="isAnimating"
+        (click)="isAnimating ? stopAnimation() : startAnimation()"
+        [disabled]="loading"
+        type="button"
+      >
+        <span class="animate-icon">{{ isAnimating ? '⏸' : '▶' }}</span>
+        <span class="animate-label">{{ isAnimating ? 'Stop' : 'Pulse' }}</span>
+      </button>
+      <p class="animate-date" *ngIf="isAnimating">{{ currentAnimationDate }}</p>
     </section>
 
     <footer class="sidebar-footer">

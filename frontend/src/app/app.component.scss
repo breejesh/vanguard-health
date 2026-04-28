@@ -243,7 +243,7 @@ select {
 	height: 100%;
 	min-height: 0;
 	overflow: hidden;
-	background: linear-gradient(180deg, #8cc4de 0%, #6daed0 55%, #5a9ec5 100%);
+	background: #d5dadc; // map background color
 	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
@@ -371,6 +371,18 @@ select {
 	font-weight: 600;
 }
 
+.window-chip.active:hover {
+	border: 1px solid rgba(110, 158, 230, 0.35);
+	background: rgba(14, 33, 68, 0.72);
+	color: var(--text-main);
+}
+
+.window-chip:hover {
+	color: #05252f;
+	border-color: transparent;
+	background: linear-gradient(90deg, #1de7d7, #4ad8ff);
+}
+
 .window-chip.active {
 	color: #05252f;
 	border-color: transparent;
@@ -411,6 +423,45 @@ select {
 	color: #d9ffff;
 }
 
+.filter-buttons {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+.filter-chip {
+	padding: 6px 10px;
+	border-radius: 20px;
+	border: 1px solid rgba(110, 158, 230, 0.35);
+	background: rgba(14, 33, 68, 0.72);
+	color: var(--text-main);
+	cursor: pointer;
+	font-size: 0.75rem;
+	font-weight: 500;
+	transition: all 0.2s ease;
+}
+
+.filter-chip.active:hover:not(:disabled) {
+	color: white;
+	border-color: rgba(110, 158, 230, 0.6);
+	background: rgba(20, 45, 85, 0.85);
+}
+
+
+.filter-chip:hover:not(:disabled) {
+	color: #05252f;
+	border-color: transparent;
+	background: linear-gradient(90deg, #1de7d7, #4ad8ff);
+
+}
+
+.filter-chip.active {
+	color: #05252f;
+	border-color: transparent;
+	background: linear-gradient(90deg, #1de7d7, #4ad8ff);
+}
+
 @media (max-width: 980px) {
 	.shell {
 		grid-template-columns: 1fr;
@@ -436,5 +487,171 @@ select {
 
 	.custom-window {
 		justify-content: flex-start;
+	}
+}
+
+// Animation feature styles
+.animate-section {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding: 12px;
+	border-radius: 10px;
+	border: 1px solid rgba(118, 174, 255, 0.28);
+	background: rgba(18, 41, 79, 0.4);
+}
+
+.animate-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 10px 14px;
+	border-radius: 8px;
+	border: 2px solid rgba(110, 158, 230, 0.5);
+	background: linear-gradient(90deg, rgba(25, 60, 110, 0.6), rgba(15, 40, 85, 0.6));
+	color: var(--text-main);
+	cursor: pointer;
+	font-size: 0.85rem;
+	font-weight: 600;
+	transition: all 0.3s ease;
+}
+
+.animate-btn:hover:not(:disabled) {
+	border-color: rgba(110, 158, 230, 0.8);
+	background: linear-gradient(90deg, rgba(35, 75, 130, 0.7), rgba(25, 55, 105, 0.7));
+	box-shadow: 0 0 12px rgba(110, 158, 230, 0.3);
+}
+
+.animate-btn.playing {
+	border-color: #ff6b6b;
+	background: linear-gradient(90deg, rgba(139, 35, 35, 0.7), rgba(100, 20, 20, 0.7));
+	color: #ffb3b3;
+}
+
+.animate-btn.playing:hover:not(:disabled) {
+	border-color: #ff8c8c;
+	box-shadow: 0 0 16px rgba(255, 107, 107, 0.4);
+}
+
+.animate-icon {
+	font-size: 0.95rem;
+	display: inline-block;
+}
+
+.animate-label {
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.animate-date {
+	margin: 0;
+	text-align: center;
+	font-size: 0.78rem;
+	color: #b3d9ff;
+	letter-spacing: 0.03em;
+	font-weight: 500;
+}
+
+// Overlay that appears during animation
+.animation-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.65);
+	pointer-events: none;
+	z-index: 50;
+	animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+// Pulsing animation for hotspots during animation playback
+@keyframes hotspotPulse {
+	0% {
+		fill-opacity: 0.16;
+		stroke-opacity: 0.06;
+	}
+	25% {
+		fill-opacity: 0.32;
+		stroke-opacity: 0.09;
+	}
+	50% {
+		fill-opacity: 0.5;
+		stroke-opacity: 0.12;
+	}
+	75% {
+		fill-opacity: 0.32;
+		stroke-opacity: 0.09;
+	}
+	100% {
+		fill-opacity: 0.16;
+		stroke-opacity: 0.06;
+	}
+}
+
+:host ::ng-deep .leaflet-overlay-pane path.hotspot-main-circle {
+	stroke-opacity: 0.12 !important;
+}
+
+:host ::ng-deep .leaflet-hotspot-pane path.leaflet-interactive[stroke-dasharray] {
+	stroke-opacity: 0.12 !important;
+}
+
+.hotspot-pulse {
+	animation: hotspotPulse 1.2s ease-in-out infinite !important;
+}
+
+// Animation mode styling
+.shell.animating {
+	// The content panel gets highlighted through the overlay
+	.content {
+		z-index: 101;
+		box-shadow: 0 0 40px rgba(118, 174, 255, 0.3);
+	}
+
+	.sidebar {
+		position: relative;
+		z-index: 60;
+		opacity: 1;
+		pointer-events: auto;
+	}
+
+	.sidebar > *:not(.animate-section) {
+		opacity: 0.12;
+		filter: blur(1.5px);
+		pointer-events: none;
+	}
+
+	.sidebar .animate-section {
+		position: relative;
+		z-index: 102;
+		opacity: 1;
+		pointer-events: auto;
+	}
+
+	.status-bar,
+	.map-legend {
+		opacity: 0.18;
+		filter: blur(1.5px);
+	}
+
+	.stats-grid {
+		opacity: 0.85;
+		filter: none;
+	}
+
+	.map {
+		box-shadow: 0 0 30px rgba(118, 174, 255, 0.5),
+						inset 0 0 0 1px rgba(255, 255, 255, 0.1);
 	}
 }

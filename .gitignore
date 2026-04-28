@@ -64,7 +64,7 @@ coverage.xml
 data/
 
 local_testing/data/
-local_testing/10k_synthea_covid19_csv/
+local_testing/dataset/
 
 # creds
 vanguard-health-firebase-adminsdk-fbsvc-d3d5fbe79f.json

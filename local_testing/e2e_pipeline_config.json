@@ -1,0 +1,194 @@
+{
+  "strict_project_src_modules": true,
+  "allow_script_steps": false,
+  "default_pipeline": "smoke",
+  "context": {
+    "paths": {
+      "bronze": "{{project_root}}/local_testing/data/bronze",
+      "silver": "{{project_root}}/local_testing/data/silver",
+      "gold": "{{project_root}}/local_testing/data/gold"
+    }
+  },
+      "strict_project_src_modules": true,
+      "allow_script_steps": false,
+  "base_env": {
+    "USE_METADATA": "false",
+    "MONGODB_URI": "mongodb://localhost:30017/?authSource=admin",
+    "MONGODB_DB": "vanguard_metadata",
+    "BRONZE_PATH": "{{paths.bronze}}",
+    "SILVER_PATH": "{{paths.silver}}",
+    "GOLD_PATH": "{{paths.gold}}",
+    "PIPELINE_RUN_ID": "{{pipeline_run_id}}"
+  },
+  "pipelines": {
+    "smoke": {
+      "description": "Bronze -> Silver -> Gold -> Firebase pusher(skip) with layer assertions",
+      "steps": [
+        {
+          "name": "precheck_bronze_input",
+          "type": "check",
+          "checks": [
+            {
+              "type": "exists",
+              "path": "{{paths.bronze}}"
+            },
+            {
+              "type": "glob_min",
+              "path": "{{paths.bronze}}",
+              "pattern": "**/*.parquet",
+              "min": 1
+            }
+          ]
+        },
+        {
+          "name": "bronze_to_silver",
+          "type": "module",
+          "target": "src.spark_jobs.bronze_to_silver",
+          "env": {
+            "SILVER_TS": "{{run_ts}}"
+          },
+          "checks": [
+            {
+              "type": "glob_min",
+              "path": "{{paths.silver}}/patient",
+              "pattern": "**/{{run_ts}}.parquet",
+              "min": 1
+            },
+            {
+              "type": "glob_min",
+              "path": "{{paths.silver}}/condition",
+              "pattern": "**/{{run_ts}}.parquet",
+              "min": 1
+            },
+            {
+              "type": "parquet_min_rows",
+              "path": "{{paths.silver}}/condition",
+              "pattern": "**/{{run_ts}}.parquet",
+              "min_rows": 1
+            }
+          ]
+        },
+        {
+          "name": "silver_to_gold",
+          "type": "module",
+          "target": "src.spark_jobs.silver_to_gold",
+          "env": {
+            "SILVER_TS": "{{run_ts}}"
+          },
+          "checks": [
+            {
+              "type": "exists",
+              "path": "{{paths.gold}}/_conditions.parquet"
+            },
+            {
+              "type": "exists",
+              "path": "{{paths.gold}}/_h3_reference.parquet"
+            },
+            {
+              "type": "glob_min",
+              "path": "{{paths.gold}}",
+              "pattern": "*.parquet",
+              "exclude_prefix": "_",
+              "min": 1
+            },
+            {
+              "type": "parquet_min_rows",
+              "path": "{{paths.gold}}",
+              "pattern": "*.parquet",
+              "exclude_prefix": "_",
+              "min_rows": 1
+            }
+          ]
+        },
+        {
+          "name": "firebase_pusher_skip_mode",
+          "type": "module",
+          "target": "src.common.firebase_pusher",
+          "env": {
+            "ENABLE_FIREBASE_SYNC": "false"
+          }
+        }
+      ]
+    },
+    "gold_idempotence": {
+      "description": "Run Silver->Gold twice on same SILVER_TS and assert identical gold condition parquet stats",
+      "steps": [
+        {
+          "name": "first_gold_run",
+          "type": "module",
+          "target": "src.spark_jobs.silver_to_gold",
+          "env": {
+            "SILVER_TS": "{{run_ts}}"
+          },
+          "checks": [
+            {
+              "type": "capture_parquet_stats",
+              "id": "gold_after_first",
+              "path": "{{paths.gold}}",
+              "pattern": "*.parquet",
+              "exclude_prefix": "_",
+              "sum_columns": [
+                "case_count"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "second_gold_run_same_input",
+          "type": "module",
+          "target": "src.spark_jobs.silver_to_gold",
+          "env": {
+            "SILVER_TS": "{{run_ts}}"
+          },
+          "checks": [
+            {
+              "type": "capture_parquet_stats",
+              "id": "gold_after_second",
+              "path": "{{paths.gold}}",
+              "pattern": "*.parquet",
+              "exclude_prefix": "_",
+              "sum_columns": [
+                "case_count"
+              ]
+            },
+            {
+              "type": "assert_metric_equal",
+              "left": "gold_after_first",
+              "right": "gold_after_second"
+            }
+          ]
+        }
+      ]
+    },
+    "with_fetcher": {
+      "description": "Fetcher -> Bronze->Silver->Gold. Requires reachable FHIR endpoint and credentials/env setup.",
+      "steps": [
+        {
+          "name": "fetcher_job",
+          "type": "module",
+          "target": "src.ingestion.fetcher_job",
+          "env": {
+            "BRONZE_TS": "{{run_ts}}"
+          }
+        },
+        {
+          "name": "bronze_to_silver_after_fetch",
+          "type": "module",
+          "target": "src.spark_jobs.bronze_to_silver",
+          "env": {
+            "BRONZE_TS": "{{run_ts}}",
+            "SILVER_TS": "{{run_ts}}"
+          }
+        },
+        {
+          "name": "silver_to_gold_after_fetch",
+          "type": "module",
+          "target": "src.spark_jobs.silver_to_gold",
+          "env": {
+            "SILVER_TS": "{{run_ts}}"
+          }
+        }
+      ]
+    }
+  }
+}

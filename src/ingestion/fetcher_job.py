@@ -29,8 +29,10 @@ def main():
 
         # Get last cursor for incremental fetch; bootstrap with a wider lookback on first run.
         last_cursor = metadata_manager.get_last_cursor("patient_ingestion")
+        requested_cursor = last_cursor
         if last_cursor is None:
             last_cursor = datetime.utcnow() - timedelta(days=config.FETCH_LOOKBACK_DAYS)
+            requested_cursor = last_cursor
 
         logger.info(f"Fetching resources modified since {last_cursor.isoformat()}")
 
@@ -43,8 +45,10 @@ def main():
             success = writer.write_to_bronze(resources, run_ts=explicit_bronze_ts)
 
             if success:
-                # Update cursor to now only after successful write
-                metadata_manager.update_cursor("patient_ingestion", datetime.utcnow())
+                # Advance cursor using source event time to avoid gaps or replay drift.
+                latest_fetched_ts = fetcher.get_latest_resource_timestamp(resources, fallback=requested_cursor)
+                if latest_fetched_ts is not None:
+                    metadata_manager.update_cursor("patient_ingestion", latest_fetched_ts)
                 metadata_manager.set_pipeline_state(
                     "bronze_latest_run",
                     {

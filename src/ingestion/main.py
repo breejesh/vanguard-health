@@ -29,8 +29,10 @@ def main():
         
         # Get last cursor for incremental fetch; bootstrap with a wider lookback on first run.
         last_cursor = metadata_manager.get_last_cursor("patient_ingestion")
+        requested_cursor = last_cursor
         if last_cursor is None:
             last_cursor = datetime.now() - timedelta(days=config.FETCH_LOOKBACK_DAYS)
+            requested_cursor = last_cursor
         
         logger.info(f"Fetching FHIR resources modified since {last_cursor}")
         
@@ -43,8 +45,10 @@ def main():
             writer = BronzeWriter(config.BRONZE_PATH)
             writer.write_to_bronze(resources, run_ts=explicit_bronze_ts)
             
-            # Update cursor
-            metadata_manager.update_cursor("patient_ingestion", datetime.now())
+            # Advance cursor using source event time to avoid gaps or replay drift.
+            latest_fetched_ts = fetcher.get_latest_resource_timestamp(resources, fallback=requested_cursor)
+            if latest_fetched_ts is not None:
+                metadata_manager.update_cursor("patient_ingestion", latest_fetched_ts)
             metadata_manager.set_pipeline_state(
                 "bronze_latest_run",
                 {

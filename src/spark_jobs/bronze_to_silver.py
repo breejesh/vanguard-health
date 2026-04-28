@@ -13,6 +13,7 @@ from typing import Tuple
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.window import Window
 from pyspark.sql.functions import col, coalesce, concat_ws, current_timestamp, get_json_object, lit, regexp_extract, row_number, to_timestamp, trim, when, length
+import pyarrow as pa
 
 # Add src to path
 sys.path.insert(0, '/app')
@@ -56,10 +57,22 @@ def _run_date_from_ts(run_ts: str) -> str:
 
 def create_spark_session() -> SparkSession:
     """Create a plain Spark session for Parquet-backed Bronze reads/writes."""
-    return SparkSession.builder \
+    import platform
+    
+    builder = SparkSession.builder \
         .appName("bronze-to-silver") \
-        .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer") \
-        .getOrCreate()
+        .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+    
+    # Windows: disable Hadoop native + permissions to avoid winutils.exe
+    if platform.system() == "Windows":
+        builder = builder \
+            .config("spark.hadoop.fs.file.impl", "org.apache.hadoop.fs.RawLocalFileSystem") \
+            .config("spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version", "1") \
+            .config("spark.hadoop.hadoop.security.groups.cache.warn.after.ms", "30000") \
+            .config("spark.hadoop.hadoop.native.lib", "false") \
+            .config("spark.hadoop.io.nativeio.NativeIO.USABLE", "false")
+    
+    return builder.getOrCreate()
 
 
 def read_bronze_table(spark: SparkSession, bronze_ts: str, resource_type: str, since_timestamp: datetime = None) -> DataFrame:
@@ -320,184 +333,138 @@ def write_silver_table(df: DataFrame, output_path: str):
 
 
 def write_silver_parquet(df: DataFrame, output_path: str):
-    """Write DataFrame to Silver as Parquet."""
+    """Write DataFrame to Silver as Parquet - direct Python approach."""
     try:
+        import pyarrow.parquet as pq
+        from pyspark.sql.types import TimestampType
+        
         output_file = Path(output_path)
         output_file.parent.mkdir(parents=True, exist_ok=True)
-
-        temp_dir = output_file.parent / f".tmp_{output_file.stem}_{int(time.time() * 1000)}"
-        df.coalesce(1).write.mode("overwrite").parquet(str(temp_dir))
-
-        part_files = list(temp_dir.glob("part-*.parquet"))
-        if not part_files:
-            raise RuntimeError(f"No parquet part file generated in temp dir {temp_dir}")
-
-        shutil.copyfile(part_files[0], output_file)
-        shutil.rmtree(temp_dir, ignore_errors=True)
-
-        logger.info(f"Wrote {df.count()} records to Parquet: {output_file}")
+        
+        # Cast timestamp columns to string to avoid Pandas conversion issues
+        df_write = df
+        for field in df.schema.fields:
+            if isinstance(field.dataType, TimestampType):
+                df_write = df_write.withColumn(field.name, col(field.name).cast("string"))
+        
+        # Convert to Pandas on driver
+        pandas_df = df_write.toPandas()
+        
+        # Write directly with PyArrow, bypassing Hadoop entirely
+        arrow_table = pa.Table.from_pandas(pandas_df, preserve_index=False)
+        pq.write_table(arrow_table, str(output_file))
+        
+        logger.info(f"Wrote {len(pandas_df)} records to Parquet: {output_file}")
         
     except Exception as e:
         logger.error(f"Error writing Parquet for {output_path}: {e}")
         raise
 
 
-def transform_bronze_to_silver(bronze_path: str, silver_path: str) -> Tuple[int, str]:
+
+def transform_bronze_to_silver(spark, metadata_manager: MetadataManager = None):
     """
-    Transform Bronze to Silver layer using pure Python JSON (local testing friendly).
+    Core transformation: reads bronze layer, transforms to silver.
+    Returns: (processed_records, latest_processed_cursor)
+    """
+    pipeline_run_id = os.getenv("PIPELINE_RUN_ID")
     
-    Args:
-        bronze_path: Path to bronze layer directory
-        silver_path: Path to silver layer directory
-        
-    Returns:
-        Tuple of (exit_code, message)
-        - 0 on success
-        - 1 on error
-    """
-    try:
-        bronze_path = Path(bronze_path)
-        silver_path = Path(silver_path)
-
-        if not bronze_path.exists():
-            return 1, f"Bronze directory not found: {bronze_path}"
-
-        silver_path.mkdir(parents=True, exist_ok=True)
-
-        resource_types = set()
-        for json_file in bronze_path.rglob("*.json"):
-            resource_type = json_file.parent.name
-            resource_types.add(resource_type)
-
-        if not resource_types:
-            return 1, "No JSON files found in bronze directory"
-
-        logger.info(f"Processing {len(resource_types)} resource types")
-
-        for resource_type in sorted(resource_types):
-            resource_dir = bronze_path / resource_type
-            json_files = list(resource_dir.glob("*.json"))
-
-            if not json_files:
-                continue
-
-            try:
-                output_dir = silver_path / f"{resource_type}_silver"
-                output_dir.mkdir(parents=True, exist_ok=True)
-                output_file = output_dir / "data.jsonl"
-
-                processed_count = 0
-                with open(output_file, 'w', encoding='utf-8') as out_f:
-                    for json_file in json_files:
-                        try:
-                            with open(json_file, 'r', encoding='utf-8') as in_f:
-                                record = json.load(in_f)
-                                record['_processed_at'] = datetime.now().isoformat()
-                                record['_resource_type'] = resource_type
-                                out_f.write(json.dumps(record) + '\n')
-                                processed_count += 1
-                        except Exception as e:
-                            logger.debug(f"Skipped {json_file.name}: {e}")
-
-                if processed_count > 0:
-                    logger.info(f"[OK] Processed {processed_count} {resource_type} records -> {output_dir}")
-                else:
-                    logger.warning(f"[SKIP] No valid records found for {resource_type}")
-
-            except Exception as e:
-                logger.warning(f"Error processing {resource_type}: {e}")
-                continue
-
-        return 0, f"Transformation completed. Output: {silver_path}"
-
-    except Exception as e:
-        logger.error(f"Error in transform_bronze_to_silver: {e}", exc_info=True)
-        return 1, f"Transformation failed: {str(e)}"
-
-
-def main():
-    """Main transformation pipeline - Spark with flat parquet snapshots."""
-    spark = None
-    metadata_manager = None
-    try:
-        logger.info("🔥 Starting Bronze to Silver transformation (SPARK + PARQUET)")
-        
-        spark = create_spark_session()
-        metadata_manager = MetadataManager(config.MONGODB_URI, config.MONGODB_DB)
-        pipeline_run_id = os.getenv("PIPELINE_RUN_ID")
-        bronze_state = metadata_manager.get_pipeline_state("bronze_latest_run")
-
-        explicit_bronze_ts = os.getenv("BRONZE_TS")
-        explicit_silver_ts = os.getenv("SILVER_TS")
-        if explicit_bronze_ts:
-            bronze_ts = explicit_bronze_ts
-            logger.info(f"Using explicit bronze timestamp from BRONZE_TS: {bronze_ts}")
-        else:
+    # Get bronze timestamp
+    explicit_bronze_ts = os.getenv("BRONZE_TS")
+    if explicit_bronze_ts:
+        bronze_ts = explicit_bronze_ts
+        logger.info(f"Using explicit bronze timestamp from BRONZE_TS: {bronze_ts}")
+    else:
+        if metadata_manager:
+            bronze_state = metadata_manager.get_pipeline_state("bronze_latest_run")
             if bronze_state and bronze_state.get("run_ts"):
                 bronze_ts = bronze_state.get("run_ts")
                 logger.info(f"Using bronze timestamp from state: {bronze_ts}")
             else:
-                bronze_root = Path(config.BRONZE_PATH)
-                ts_candidates = []
-                if bronze_root.exists():
-                    for parquet_file in bronze_root.rglob("*.parquet"):
-                        stem = parquet_file.stem
-                        if stem.isdigit():
-                            ts_candidates.append(stem)
-
-                if ts_candidates:
-                    bronze_ts = sorted(ts_candidates)[-1]
-                    logger.warning(f"No bronze state found, using latest timestamp file id: {bronze_ts}")
-                else:
-                    bronze_ts = str(int(datetime.utcnow().timestamp() * 1000))
-                    logger.warning(f"No bronze timestamp directories found, fallback timestamp: {bronze_ts}")
-
-        silver_ts = explicit_silver_ts or bronze_ts
-        logger.info(f"Silver output timestamp: {silver_ts}")
-        if not pipeline_run_id and bronze_state:
-            pipeline_run_id = bronze_state.get("pipeline_run_id")
-        if pipeline_run_id:
-            logger.info(f"Pipeline run context: {pipeline_run_id}")
-
-        last_cursor = metadata_manager.get_last_cursor(BRONZE_TO_SILVER_CURSOR_NAME)
-        if last_cursor is None:
-            logger.info("No bronze-to-silver cursor found, processing the current bronze snapshot")
+                bronze_ts = None
         else:
-            logger.info(f"Processing bronze rows newer than {last_cursor.isoformat()}")
+            bronze_ts = None
         
-        # Read Bronze tables
-        logger.info("Reading Bronze layer...")
-        bronze_tables = [
-            ("Patient", transform_patients, "patient", "patient_id"),
-            ("Encounter", transform_encounters, "encounter", "encounter_id"),
-            ("Observation", transform_observations, "observation", "obs_id"),
-            ("Condition", transform_conditions, "condition", "condition_id"),
-            ("MedicationRequest", transform_medication_requests, "medicationrequest", "medicationrequest_id"),
-        ]
+        if not bronze_ts:
+            bronze_root = Path(config.BRONZE_PATH)
+            ts_candidates = []
+            if bronze_root.exists():
+                for parquet_file in bronze_root.rglob("*.parquet"):
+                    stem = parquet_file.stem
+                    if stem.isdigit():
+                        ts_candidates.append(stem)
 
-        latest_processed_cursor = last_cursor
-        processed_records = 0
-        
-        for resource_type, transform_fn, table_name, record_key_field in bronze_tables:
-            logger.info(f"Transforming {resource_type} data...")
-            bronze_delta = read_bronze_table(spark, bronze_ts, resource_type, last_cursor)
+            if ts_candidates:
+                bronze_ts = sorted(ts_candidates)[-1]
+                logger.warning(f"No bronze state found, using latest timestamp file id: {bronze_ts}")
+            else:
+                bronze_ts = str(int(datetime.utcnow().timestamp() * 1000))
+                logger.warning(f"No bronze timestamp directories found, fallback timestamp: {bronze_ts}")
 
-            if bronze_delta is None or len(bronze_delta.take(1)) == 0:
-                logger.info(f"No new {resource_type} rows to process")
-                continue
+    explicit_silver_ts = os.getenv("SILVER_TS")
+    silver_ts = explicit_silver_ts or bronze_ts
+    logger.info(f"Silver output timestamp: {silver_ts}")
+    
+    if pipeline_run_id:
+        logger.info(f"Pipeline run context: {pipeline_run_id}")
 
-            batch_cursor_value = bronze_delta.selectExpr("max(ingestion_timestamp) as latest_ingestion_timestamp").collect()[0][0]
-            batch_cursor = _coerce_datetime_value(batch_cursor_value)
-            if batch_cursor is not None and (latest_processed_cursor is None or batch_cursor > latest_processed_cursor):
-                latest_processed_cursor = batch_cursor
+    last_cursor = None
+    previous_silver_ts = None
+    if metadata_manager:
+        last_cursor = metadata_manager.get_last_cursor(BRONZE_TO_SILVER_CURSOR_NAME)
+        silver_state = metadata_manager.get_pipeline_state("silver_latest_run")
+        if silver_state and silver_state.get("run_ts"):
+            candidate_previous_ts = str(silver_state.get("run_ts"))
+            if candidate_previous_ts and candidate_previous_ts != str(silver_ts):
+                previous_silver_ts = candidate_previous_ts
+    
+    if last_cursor is None:
+        logger.info("No bronze-to-silver cursor found, processing the current bronze snapshot")
+    else:
+        logger.info(f"Processing bronze rows newer than {last_cursor.isoformat()}")
+    
+    # Read Bronze tables
+    logger.info("Reading Bronze layer...")
+    bronze_tables = [
+        ("Patient", transform_patients, "patient", "patient_id"),
+        ("Encounter", transform_encounters, "encounter", "encounter_id"),
+        ("Observation", transform_observations, "observation", "obs_id"),
+        ("Condition", transform_conditions, "condition", "condition_id"),
+        ("MedicationRequest", transform_medication_requests, "medicationrequest", "medicationrequest_id"),
+    ]
 
-            silver_delta = transform_fn(bronze_delta)
-            processed_records += silver_delta.count()
+    latest_processed_cursor = last_cursor
+    processed_records = 0
+    
+    for resource_type, transform_fn, table_name, record_key_field in bronze_tables:
+        logger.info(f"Transforming {resource_type} data...")
+        base_snapshot = None
+        if previous_silver_ts:
+            base_snapshot = read_silver_timestamp_snapshot(spark, previous_silver_ts, table_name)
+        if base_snapshot is None:
+            base_snapshot = read_silver_timestamp_snapshot(spark, silver_ts, table_name)
 
-            current_snapshot = read_silver_timestamp_snapshot(spark, silver_ts, table_name)
-            silver_current = merge_silver_snapshot(current_snapshot, silver_delta, record_key_field)
-            write_silver_table(silver_current, silver_snapshot_file_path(silver_ts, table_name))
-        
+        bronze_delta = read_bronze_table(spark, bronze_ts, resource_type, last_cursor)
+
+        if bronze_delta is None or len(bronze_delta.take(1)) == 0:
+            logger.info(f"No new {resource_type} rows to process")
+            if base_snapshot is not None:
+                write_silver_table(base_snapshot, silver_snapshot_file_path(silver_ts, table_name))
+                logger.info(f"Carried forward previous {table_name} snapshot to {silver_ts}")
+            continue
+
+        batch_cursor_value = bronze_delta.selectExpr("max(ingestion_timestamp) as latest_ingestion_timestamp").collect()[0][0]
+        batch_cursor = _coerce_datetime_value(batch_cursor_value)
+        if batch_cursor is not None and (latest_processed_cursor is None or batch_cursor > latest_processed_cursor):
+            latest_processed_cursor = batch_cursor
+
+        silver_delta = transform_fn(bronze_delta)
+        processed_records += silver_delta.count()
+
+        silver_current = merge_silver_snapshot(base_snapshot, silver_delta, record_key_field)
+        write_silver_table(silver_current, silver_snapshot_file_path(silver_ts, table_name))
+    
+    if metadata_manager:
         if latest_processed_cursor is not None and (last_cursor is None or latest_processed_cursor > last_cursor):
             metadata_manager.update_cursor(BRONZE_TO_SILVER_CURSOR_NAME, latest_processed_cursor)
 
@@ -526,6 +493,30 @@ def main():
             },
         )
 
+    return processed_records, latest_processed_cursor
+
+
+def main():
+    """Main orchestration: setup, transform, cleanup."""
+    spark = None
+    metadata_manager = None
+    try:
+        logger.info("🔥 Starting Bronze to Silver transformation (SPARK + PARQUET)")
+        
+        spark = create_spark_session()
+        
+        # MetadataManager is optional for local testing
+        use_metadata = os.getenv("USE_METADATA", "true").lower() == "true"
+        if use_metadata:
+            try:
+                metadata_manager = MetadataManager(config.MONGODB_URI, config.MONGODB_DB)
+            except Exception as e:
+                logger.warning(f"MetadataManager unavailable (local testing?): {e}")
+                metadata_manager = None
+        
+        # Run transformation
+        processed_records, _ = transform_bronze_to_silver(spark, metadata_manager)
+        
         logger.info("✅ Bronze to Silver transformation COMPLETED")
         return 0
         

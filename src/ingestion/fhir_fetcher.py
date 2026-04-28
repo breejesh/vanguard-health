@@ -120,6 +120,27 @@ class FHIRFetcher:
                 continue
         
         return resources
+
+    @staticmethod
+    def _coerce_last_updated(last_updated: str) -> Optional[datetime]:
+        """Parse FHIR meta.lastUpdated to a naive UTC datetime."""
+        if not last_updated:
+            return None
+
+        try:
+            parsed = datetime.fromisoformat(str(last_updated).replace('Z', '+00:00'))
+            return parsed.replace(tzinfo=None)
+        except Exception:
+            return None
+
+    def get_latest_resource_timestamp(self, resources: List[Dict], fallback: datetime = None) -> Optional[datetime]:
+        """Return max meta.lastUpdated from fetched resources, or fallback if unavailable."""
+        latest = fallback
+        for resource in resources:
+            candidate = self._coerce_last_updated((resource or {}).get('meta', {}).get('lastUpdated'))
+            if candidate is not None and (latest is None or candidate > latest):
+                latest = candidate
+        return latest
     
     def _fetch_resource_type(self, resource_type: str, last_modified: datetime) -> List[Dict]:
         """Fetch specific resource type."""
@@ -130,7 +151,7 @@ class FHIRFetcher:
         
         url = f"{self.api_url}/{resource_type}"
         params = {
-            "_lastUpdated": f"ge{timestamp_str}",
+            "_lastUpdated": f"gt{timestamp_str}",
             "_count": "100",
             "_format": "json"
         }

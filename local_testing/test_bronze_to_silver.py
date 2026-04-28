@@ -1,82 +1,76 @@
 #!/usr/bin/env python
 """
-Local testing launcher for the production bronze-to-silver job.
+Local testing: Bronze → Silver transformation.
+Uses production src code directly - calls main() with env vars.
+No Docker, no MongoDB required.
 """
 import io
 import os
-import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
-# Handle Unicode output on Windows
+# Set up Windows environment for Spark/Hadoop BEFORE any imports
 if sys.platform == "win32":
     os.environ['PYTHONIOENCODING'] = 'utf-8'
+    # Point to local_testing directory (Hadoop will look for bin/ inside it)
+    project_root_temp = Path(__file__).parent
+    local_hadoop_home = str(project_root_temp).replace("\\", "/")
+    os.environ["HADOOP_HOME"] = local_hadoop_home
+    os.environ["hadoop.home.dir"] = local_hadoop_home
+    os.environ["JAVA_TOOL_OPTIONS"] = f'-Dhadoop.home.dir="{local_hadoop_home}"'
+    
+    # Create bin directory for winutils.exe
+    bin_dir = project_root_temp / "bin"
+    bin_dir.mkdir(exist_ok=True)
+    
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
 project_root = Path(__file__).parent.parent
 local_data_path = project_root / "local_testing" / "data"
 
+# Add to path and set working directory
+os.chdir(project_root)
+sys.path.insert(0, str(project_root))
 
-def run_production_spark_job(run_ts: str = None) -> int:
-    """Run the production Spark job inside the local Docker image."""
-    docker_command = [
-        "docker",
-        "run",
-        "--rm",
-        "-e",
-        "PYTHONUNBUFFERED=1",
-        "-e",
-        "PYTHONIOENCODING=utf-8",
-        "-e",
-        "MONGODB_URI=mongodb://root:mongopass@host.docker.internal:30017/vanguard_metadata?authSource=admin",
-        "-e",
-        "MONGODB_DB=vanguard_metadata",
-        "-e",
-        "DATA_PATH=/mnt/data",
-        "-e",
-        "BRONZE_PATH=/mnt/data/bronze",
-        "-e",
-        "SILVER_PATH=/mnt/data/silver",
-        "-v",
-        f"{project_root.as_posix()}:/app",
-        "-v",
-        f"{local_data_path.as_posix()}:/mnt/data",
-        "vanguard/spark-jobs:latest",
-    ]
+# Set paths for bronze/silver data
+os.environ['BRONZE_PATH'] = str(local_data_path / "bronze")
+os.environ['SILVER_PATH'] = str(local_data_path / "silver")
 
-    if run_ts:
-        docker_command.extend(["-e", f"BRONZE_TS={run_ts}"])
-        docker_command.extend(["-e", f"SILVER_TS={run_ts}"])
+# Disable metadata manager for local testing (no MongoDB)
+os.environ['USE_METADATA'] = "false"
 
-    pipeline_run_id = os.getenv("PIPELINE_RUN_ID")
-    if pipeline_run_id:
-        docker_command.extend(["-e", f"PIPELINE_RUN_ID={pipeline_run_id}"])
-    if run_ts:
-        docker_command.extend(["-e", f"PIPELINE_RUN_TS={run_ts}"])
+# Bypass MongoDB env vars (won't be used with USE_METADATA=false)
+os.environ['MONGODB_URI'] = 'mongodb://localhost:30017/?authSource=admin'
+os.environ['MONGODB_DB'] = 'vanguard_metadata'
 
-    docker_command.extend([
-        "spark-submit",
-        "--master",
-        "local[4]",
-        "--driver-memory",
-        "2g",
-        "--executor-memory",
-        "2g",
-        "/app/src/spark_jobs/bronze_to_silver.py",
-    ])
+from src.spark_jobs.bronze_to_silver import main
 
-    completed = subprocess.run(
-        docker_command,
-        cwd=project_root,
-        check=False,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-    )
-    return completed.returncode
+
+def run_bronze_to_silver_local() -> int:
+    """Run production bronze-to-silver main() on local data."""
+    bronze_path = local_data_path / "bronze"
+    silver_path = local_data_path / "silver"
+    
+    if not bronze_path.exists():
+        print(f"ERROR: Bronze path not found: {bronze_path}")
+        return 1
+    
+    silver_path.mkdir(parents=True, exist_ok=True)
+    
+    print("="*70)
+    print("BRONZE → SILVER TRANSFORMATION (Local, Full Dataset)")
+    print("="*70)
+    print(f"Bronze:  {bronze_path}")
+    print(f"Silver:  {silver_path}")
+    print("Metadata: DISABLED (local testing)")
+    print("="*70)
+    print()
+    
+    # Call production main() directly
+    return main()
 
 
 if __name__ == "__main__":
-    timestamp_arg = sys.argv[1] if len(sys.argv) > 1 else None
-    sys.exit(run_production_spark_job(timestamp_arg))
+    sys.exit(run_bronze_to_silver_local())

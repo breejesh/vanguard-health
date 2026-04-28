@@ -92,8 +92,8 @@ Example:
 ### 4) gold_daily_cells
 Document pattern:
 - Collection: `gold_daily_cells`
-- Document id: `<condition_code>_<date_key>_<h3>`
-- Cardinality: many documents (condition x day x h3)
+- Document id: `<condition_code>_<date_key>_<h3>_<age_group>_<gender>`
+- Cardinality: many documents (condition x day x h3 x age_group x gender)
 
 Fields:
 | Field | Type | Required | Source | Notes |
@@ -101,7 +101,9 @@ Fields:
 | condition_code | string | yes | pusher | Condition code filter key. |
 | date_key | string (YYYY-MM-DD) | yes | pusher | Day bucket used for date filtering. |
 | h3 | string | yes | pusher | H3 cell id. |
-| case_count | number | yes | pusher | Cases for this condition/day/cell. |
+| age_group | string | yes | pusher | Age group: one of `0-17`, `18-34`, `35-54`, `55+`, `Unknown` |
+| gender | string | yes | pusher | Gender: one of `male`, `female`, `other`, `unknown` |
+| case_count | number | yes | pusher | Cases for this condition/day/cell/age_group/gender. |
 | updated_at | Firestore server timestamp | no | pusher | Write timestamp in Firestore. |
 
 Example:
@@ -110,7 +112,33 @@ Example:
   "condition_code": "840539006",
   "date_key": "2026-04-05",
   "h3": "842a107ffffffff",
-  "case_count": 19,
+  "age_group": "18-34",
+  "gender": "female",
+  "case_count": 5,
+  "updated_at": "<server_timestamp>"
+}
+```
+
+### 5) gold_demographics_summary
+Document pattern:
+- Collection: `gold_demographics_summary`
+- Document id: `current`
+- Cardinality: single document with filter options metadata
+
+Fields:
+| Field | Type | Required | Source | Notes |
+|---|---|---|---|---|
+| age_groups | array<string> | yes | spark job | Available age groups for filtering. |
+| genders | array<string> | yes | spark job | Available gender values for filtering. |
+| generated_at | string (ISO-8601) | no | spark job | Last generation time. |
+| updated_at | Firestore server timestamp | no | pusher | Write timestamp in Firestore. |
+
+Example:
+```json
+{
+  "age_groups": ["0-17", "18-34", "35-54", "55+", "Unknown"],
+  "genders": ["male", "female", "other", "unknown"],
+  "generated_at": "2026-04-05T02:20:03.889421+00:00",
   "updated_at": "<server_timestamp>"
 }
 ```
@@ -122,19 +150,28 @@ Current UI query patterns:
    - `gold_overview/current`
 2. Load selectable conditions:
    - `gold_conditions` ordered by `display_name`
-3. Load map/time data for selected condition and rolling date window:
+3. Load available demographic filters:
+   - `gold_demographics_summary/current`
+4. Load map/time data for selected condition with optional demographic filters and rolling date window:
    - `gold_daily_cells`
    - `where(condition_code == <selected>)`
    - `where(date_key >= <start>)`
    - `where(date_key <= <end>)`
+   - `where(age_group in [<selected_age_groups>])` (optional)
+   - `where(gender in [<selected_genders>])` (optional)
 
 ## Firestore Index Guidance
 
-To support the rolling window map query efficiently, keep indexing aligned with the access pattern:
-1. Single-field indexes for `condition_code` and `date_key` (usually automatic).
-2. Composite index recommendation:
+To support the rolling window map query with demographic filters efficiently, keep indexing aligned with the access patterns:
+1. Single-field indexes for `condition_code`, `date_key`, `age_group`, and `gender` (usually automatic).
+2. Composite index recommendations:
    - Collection: `gold_daily_cells`
    - Fields: `condition_code` ASC, `date_key` ASC
+   - Fields: `condition_code` ASC, `age_group` ASC
+   - Fields: `condition_code` ASC, `gender` ASC
+   - Fields: `condition_code` ASC, `date_key` ASC, `age_group` ASC (for multi-filter queries)
+   - Fields: `condition_code` ASC, `date_key` ASC, `gender` ASC (for multi-filter queries)
+   - Fields: `condition_code` ASC, `date_key` ASC, `age_group` ASC, `gender` ASC (for full-filter queries)
 
 If Firestore returns an index creation error URL for the query, create the suggested index in the target project.
 

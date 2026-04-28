@@ -7,7 +7,7 @@ Our backend is a staged healthcare data pipeline:
 2. Store raw data in Bronze.
 3. Normalize and dedupe into Silver.
 4. Aggregate analytics outputs in Gold.
-5. Publish Gold to Firestore for the frontend.
+5. Publish Gold parquet + metadata for static hosting (CDN/local assets) consumed directly by the frontend.
 
 ## Data flow (simple view)
 
@@ -24,10 +24,10 @@ Our backend is a staged healthcare data pipeline:
 3. Silver -> Gold
 - Reads Silver (usually by run timestamp).
 - Aggregates condition counts by date and H3 geospatial cell.
-- Writes partitioned gold files optimized for fast map/time queries.
+- Writes partitioned JSONL plus per-condition parquet files optimized for fast map/time queries.
 
-4. Gold -> Firestore
-- Pushes pre-aggregated results for fast UI reads.
+4. Gold -> Static hosting (CDN/local)
+- Serves parquet + metadata files directly to the browser where DuckDB-WASM handles interactive filtering.
 
 ## Why this scales
 
