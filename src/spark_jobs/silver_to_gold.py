@@ -1,7 +1,7 @@
 """
 Silver to Gold transformation using Spark.
 Aggregates conditions by geography (H3), demographics, and time.
-Outputs condition-level parquet files and metadata parquet/json artifacts.
+Outputs condition-level parquet files and metadata parquet artifacts.
 """
 import json
 import logging
@@ -284,29 +284,44 @@ def merge_condition_with_existing(spark, condition_df, parquet_output: Path):
 
 
 def load_existing_gold_metadata(gold_path: Path):
-    """Load existing metadata so incremental runs can preserve historical condition/h3 context."""
+    """Load existing parquet metadata so incremental runs preserve condition/h3 context."""
     condition_display_map = {}
     condition_patient_counts = {}
     h3_metadata = {}
 
-    conditions_json = gold_path / "_conditions.json"
-    if conditions_json.exists():
+    conditions_parquet = gold_path / "_conditions.parquet"
+    if conditions_parquet.exists():
         try:
-            with open(conditions_json, 'r', encoding='utf-8') as file_obj:
-                payload = json.load(file_obj)
-            condition_display_map = payload.get("condition_display_map", {}) or {}
-            condition_patient_counts = payload.get("condition_patient_counts", {}) or {}
-        except Exception as exc:
-            logger.warning(f"Could not read existing _conditions.json: {exc}")
+            import pyarrow.parquet as pq
 
-    h3_json = gold_path / "_h3_reference.json"
-    if h3_json.exists():
-        try:
-            with open(h3_json, 'r', encoding='utf-8') as file_obj:
-                payload = json.load(file_obj)
-            h3_metadata = payload.get("h3_cells", {}) or {}
+            for row in pq.read_table(str(conditions_parquet)).to_pylist():
+                condition_code = row.get("condition_code")
+                if not condition_code:
+                    continue
+
+                condition_code = str(condition_code)
+                condition_display_map[condition_code] = str(
+                    row.get("condition_display") or condition_code
+                )
+                condition_patient_counts[condition_code] = int(row.get("patient_count") or 0)
         except Exception as exc:
-            logger.warning(f"Could not read existing _h3_reference.json: {exc}")
+            logger.warning(f"Could not read existing _conditions.parquet: {exc}")
+
+    h3_parquet = gold_path / "_h3_reference.parquet"
+    if h3_parquet.exists():
+        try:
+            import pyarrow.parquet as pq
+
+            for row in pq.read_table(str(h3_parquet)).to_pylist():
+                h3_id = row.get("h3")
+                if not h3_id:
+                    continue
+                h3_metadata[str(h3_id)] = {
+                    "latitude": float(row.get("latitude") or 0.0),
+                    "longitude": float(row.get("longitude") or 0.0),
+                }
+        except Exception as exc:
+            logger.warning(f"Could not read existing _h3_reference.parquet: {exc}")
 
     return condition_display_map, condition_patient_counts, h3_metadata
 
@@ -418,50 +433,23 @@ def transform_silver_to_gold(spark, silver_path: Path, gold_path: Path) -> Tuple
             merged_condition_data = merge_condition_with_existing(spark, condition_data, parquet_output)
             write_single_parquet(merged_condition_data, parquet_output)
             logger.info(f"[OK] Wrote parquet {parquet_output.name}")
+            total_partitions += 1
             
             # Count unique patients (approximate via case_sum)
             patient_count = merged_condition_data.agg(F.sum("case_count")).collect()[0][0] or 0
             condition_patient_counts[condition_code] = patient_count
-            
-            # Write JSONL by date
-            condition_dir = gold_path / safe_condition_code
-            condition_dir.mkdir(parents=True, exist_ok=True)
-            
-            # Group by date and write
-            for date_row in merged_condition_data.select("date_key").distinct().collect():
-                date_key = date_row.date_key
-                
-                daily_data = merged_condition_data.filter(F.col("date_key") == date_key)
-                
-                output_file = condition_dir / f"{date_key}.jsonl"
-                
-                # Collect and write
-                records = daily_data.select(
-                    "h3", "age_group", "gender", "case_count"
-                ).collect()
-                
-                with open(output_file, 'w', encoding='utf-8') as f:
-                    for rec in records:
-                        record = {
-                            "date": date_key,
-                            "h3": rec.h3,
-                            "age_group": rec.age_group,
-                            "gender": rec.gender,
-                            "case_count": int(rec.case_count)
-                        }
-                        f.write(json.dumps(record) + '\n')
-                        total_cases += rec.case_count
-                        
-                        # Collect H3 metadata
-                        if rec.h3 not in h3_metadata:
-                            lat, lng = h3_to_latlng(rec.h3)
-                            if lat is not None and lng is not None:
-                                h3_metadata[rec.h3] = {
-                                    'latitude': lat,
-                                    'longitude': lng
-                                }
-                
-                total_partitions += 1
+
+            # Keep H3 metadata current from parquet-backed aggregates.
+            for h3_row in merged_condition_data.select("h3").distinct().collect():
+                h3_id = h3_row.h3
+                if not h3_id or h3_id in h3_metadata:
+                    continue
+                lat, lng = h3_to_latlng(h3_id)
+                if lat is not None and lng is not None:
+                    h3_metadata[h3_id] = {
+                        "latitude": lat,
+                        "longitude": lng,
+                    }
         
         total_cases = int(sum(int(value) for value in condition_patient_counts.values()))
         logger.info(f"[OK] Created {total_partitions} partitions ({total_cases} total cases)")
@@ -470,19 +458,6 @@ def transform_silver_to_gold(spark, silver_path: Path, gold_path: Path) -> Tuple
         generated_at = datetime.now().isoformat()
         age_groups = ["0-17", "18-34", "35-54", "55+", "Unknown"]
         genders = ["male", "female", "other", "unknown"]
-
-        output_conditions = gold_path / "_conditions.json"
-        with open(output_conditions, 'w', encoding='utf-8') as f:
-            json.dump({
-                "generated_at": generated_at,
-                "conditions": list(condition_display_map.keys()),
-                "condition_display_map": condition_display_map,
-                "condition_patient_counts": condition_patient_counts,
-                "total_unique": len(condition_display_map),
-                "age_groups": age_groups,
-                "genders": genders
-            }, f, indent=2)
-        logger.info(f"[OK] Created _conditions.json ({len(condition_display_map)} conditions)")
 
         conditions_metadata_rows = [
             (
@@ -511,16 +486,6 @@ def transform_silver_to_gold(spark, silver_path: Path, gold_path: Path) -> Tuple
         ) if conditions_metadata_rows else spark.createDataFrame([], schema=conditions_metadata_schema)
         write_single_parquet(conditions_metadata_df, gold_path / "_conditions.parquet")
         logger.info(f"[OK] Created _conditions.parquet ({len(condition_display_map)} conditions)")
-        
-        output_h3_ref = gold_path / "_h3_reference.json"
-        with open(output_h3_ref, 'w', encoding='utf-8') as f:
-            json.dump({
-                "generated_at": generated_at,
-                "h3_resolution": H3_RESOLUTION,
-                "h3_cells": h3_metadata,
-                "total_unique": len(h3_metadata)
-            }, f, indent=2)
-        logger.info(f"[OK] Created _h3_reference.json ({len(h3_metadata)} H3 cells)")
 
         h3_metadata_rows = [
             (
