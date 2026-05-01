@@ -63,7 +63,6 @@ coverage.xml
 # Local PVC Data
 data/
 
-local_testing/data/
 local_testing/dataset/
 
 # creds
